@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="navy_deep">#FF0A1124</color>
+    <color name="navy_surface">#FF101A34</color>
+    <color name="phoenix_orange">#FFFF6B1A</color>
+    <color name="phoenix_amber">#FFFFB830</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

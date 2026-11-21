@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Reborn</string>
+    <string name="app_tagline">रुकें। चुनें। फिर से शुरू करें।</string>
+    <string name="accessibility_service_label">Reborn ऐप गार्ड</string>
+    <string name="accessibility_service_description">स्क्रीन पर कोई चयनित ऐप खुलते ही पहचानता है ताकि Reborn ध्यान भटकने से पहले आपको रोक सके। यह 100% ऑफ़लाइन चलता है—कोई भी डेटा आपके फ़ोन से बाहर नहीं जाता।</string>
+    <string name="offline_promise_badge">100% ऑफ़लाइन • बिना इंटरनेट अनुमति</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">होम</string>
+    <string name="nav_rules">नियम</string>
+    <string name="nav_apps">ऐप्स</string>
+    <string name="nav_health">स्वास्थ्य</string>
+    <string name="nav_about">परिचय</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_label">Reborn अनइंस्टॉल सुरक्षा</string>
+    <string name="device_admin_description">वैकल्पिक स्ट्रिक्ट मोड सुरक्षा जो सक्रिय फ़ोकस लॉक के दौरान Reborn को हटाने से रोकती है।</string>
+
+    <!-- Appearance & Themes -->
+    <string name="appearance_title">रूप और थीम</string>
+    <string name="theme_dark_navy">डार्क नेवी</string>
+    <string name="theme_amoled">AMOLED ब्लैक</string>
+    <string name="theme_warm_light">वॉर्म लाइट</string>
+    <string name="theme_system">सिस्टम</string>
+    <string name="dynamic_color_title">Material You डायनामिक रंग</string>
+    <string name="dynamic_color_subtitle">अपने Android वॉलपेपर के अनुसार रंग बदलें</string>
+
+    <!-- Backup & Restore -->
+    <string name="backup_title">लोकल बैकअप और रीस्टोर</string>
+    <string name="backup_subtitle">सभी नियम, चयनित ऐप्स, फ़्रिक्शन सेटिंग्स और स्ट्रीक इतिहास को ऑफ़लाइन JSON फ़ाइल में सहेजें या वापस लाएँ।</string>
+    <string name="backup_export_button">JSON बैकअप सहेजें</string>
+    <string name="backup_restore_button">JSON से रीस्टोर करें</string>
+    <string name="backup_export_success">बैकअप फ़ाइल डिवाइस पर सहेजी गई।</string>
+    <string name="backup_restore_success">%1$d नियम और %2$d ऐप्स रीस्टोर किए गए।</string>
+    <string name="backup_restore_strict_blocked">स्ट्रिक्ट मोड लॉक सक्रिय होने पर रीस्टोर की अनुमति नहीं है।</string>
+    <string name="backup_error_prefix">बैकअप कार्य विफल रहा: %1$s</string>
+
+    <!-- About & Privacy -->
+    <string name="privacy_guarantee_title">शून्य-नेटवर्क गोपनीयता गारंटी</string>
+    <string name="privacy_guarantee_body">Reborn में INTERNET अनुमति, विज्ञापन, एनालिटिक्स या कोई खाता नहीं है। सभी नियम, चयनित ऐप्स और लॉग पूरी तरह आपके फ़ोन पर रहते हैं।</string>
+    <string name="about_privacy_disclosure_button">गोपनीयता और एक्सेसिबिलिटी जानकारी</string>
+    <string name="about_replay_onboarding_button">सेटअप मार्गदर्शिका फिर से देखें</string>
+
+    <!-- Home & Insights Labels -->
+    <string name="home_offline_link">केवल ऑफ़लाइन • गोपनीयता वचन</string>
+    <string name="home_insights_title">आज की जानकारी</string>
+    <string name="home_open_insights_button">साप्ताहिक रिपोर्ट और आँकड़े</string>
+    <string name="insights_title">आँकड़े</string>
+    <string name="insights_refresh_cd">उपयोग आँकड़े ताज़ा करें</string>
+    <string name="insights_back_cd">पीछे जाएँ</string>
+
+    <!-- Home Screen Widget & Quick Settings Tile -->
+    <string name="widget_quick_block_title">क्विक ब्लॉक</string>
+    <string name="widget_quick_block_description">चयनित ऐप्स के लिए Reborn क्विक ब्लॉक चालू या बंद करें।</string>
+    <string name="widget_status_off">30 मिनट फ़ोकस के लिए शुरू करें</string>
+    <string name="widget_status_pick_apps">पहले Reborn में ऐप्स चुनें</string>
+    <string name="widget_status_active">सक्रिय • %1$d मिनट शेष</string>
+    <string name="widget_status_locked">स्ट्रिक्ट लॉक • %1$d मिनट शेष</string>
+    <string name="widget_action_start">शुरू</string>
+    <string name="widget_action_stop">रोकें</string>
+    <string name="widget_action_locked">लॉक्ड</string>
+    <string name="widget_action_pick">चुनें</string>
+    <string name="widget_toggle_cd">क्विक ब्लॉक बदलें</string>
+
+    <string name="tile_quick_block_label">क्विक ब्लॉक</string>
+    <string name="tile_quick_block_inactive_subtitle">30 मिनट ब्लॉक करने के लिए टैप करें</string>
+</resources>

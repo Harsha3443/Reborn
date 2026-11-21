@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Reborn" parent="android:Theme.Material.NoActionBar" />
+
+    <!-- Android 12+ SplashScreen theme transitioning into Theme.Reborn -->
+    <style name="Theme.Reborn.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/navy_deep</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Reborn</item>
+    </style>
+</resources>

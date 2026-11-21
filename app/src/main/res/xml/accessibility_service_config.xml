@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Accessibility configuration with view ID reporting (flagReportViewIds) and
+  window content retrieval (canRetrieveWindowContent="true").
+  Feed Blocking target packages (com.google.android.youtube, com.instagram.android,
+  com.facebook.katana, com.snapchat.android) are filtered inside FeedBlocker so
+  existing full-app blocking and browser keyword rules continue operating across all apps.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows"
+    android:canRetrieveWindowContent="true"
+    android:description="@string/accessibility_service_description"
+    android:notificationTimeout="100"
+    android:settingsActivity="com.example.MainActivity" />

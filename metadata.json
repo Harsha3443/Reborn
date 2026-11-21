@@ -1,0 +1,6 @@
+{
+  "name": "Reborn",
+  "description": "Pause. Choose. Begin again. Fully offline Android app blocker and mindful focus companion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

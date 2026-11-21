@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Reborn</string>
+    <string name="app_tagline">Pause. Choose. Begin again.</string>
+    <string name="accessibility_service_label">Reborn App Guard</string>
+    <string name="accessibility_service_description">Detects when a protected app opens on your screen so Reborn can pause distractions before they start. Runs 100% offline—zero data ever leaves your device.</string>
+    <string name="offline_promise_badge">100% Offline • Zero Internet Permission</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_rules">Rules</string>
+    <string name="nav_apps">Apps</string>
+    <string name="nav_health">Health</string>
+    <string name="nav_about">About</string>
+
+    <!-- Device Admin -->
+    <string name="device_admin_label">Reborn Uninstall Guard</string>
+    <string name="device_admin_description">Optional Strict Mode safeguard that hinders uninstalling Reborn during an active focus lock.</string>
+
+    <!-- Appearance & Themes -->
+    <string name="appearance_title">Appearance</string>
+    <string name="theme_dark_navy">Dark Navy</string>
+    <string name="theme_amoled">AMOLED Black</string>
+    <string name="theme_warm_light">Warm Light</string>
+    <string name="theme_system">System</string>
+    <string name="dynamic_color_title">Material You Dynamic Color</string>
+    <string name="dynamic_color_subtitle">Adapt accents from your Android wallpaper</string>
+
+    <!-- Backup & Restore -->
+    <string name="backup_title">Local Backup &amp; Restore</string>
+    <string name="backup_subtitle">Save or restore all rules, selected apps, friction preferences, and streak history as an offline JSON file.</string>
+    <string name="backup_export_button">Export Backup JSON</string>
+    <string name="backup_restore_button">Restore from JSON</string>
+    <string name="backup_export_success">Backup saved locally.</string>
+    <string name="backup_restore_success">Restored %1$d rules and %2$d apps.</string>
+    <string name="backup_restore_strict_blocked">Restore is blocked while Strict Mode is locked.</string>
+    <string name="backup_error_prefix">Backup action failed: %1$s</string>
+
+    <!-- About & Privacy -->
+    <string name="privacy_guarantee_title">Zero-Network Privacy Guarantee</string>
+    <string name="privacy_guarantee_body">Reborn has no INTERNET permission, no analytics, no ads, and no accounts. All rules, app selections, and logs remain strictly on your device.</string>
+    <string name="about_privacy_disclosure_button">Privacy &amp; Accessibility Disclosure</string>
+    <string name="about_replay_onboarding_button">Re-run Setup Walkthrough</string>
+
+    <!-- Home & Insights Labels -->
+    <string name="home_offline_link">Offline-only • Accessibility Promise</string>
+    <string name="home_insights_title">Today\'s Insights</string>
+    <string name="home_open_insights_button">Weekly Report &amp; Insights</string>
+    <string name="insights_title">Insights</string>
+    <string name="insights_refresh_cd">Refresh usage stats</string>
+    <string name="insights_back_cd">Navigate back</string>
+
+    <!-- Home Screen Widget & Quick Settings Tile -->
+    <string name="widget_quick_block_title">Quick Block</string>
+    <string name="widget_quick_block_description">Toggle Reborn Quick Block for your selected distracting apps.</string>
+    <string name="widget_status_off">Tap Start for a 30m focus block</string>
+    <string name="widget_status_pick_apps">Select distracting apps in Reborn first</string>
+    <string name="widget_status_active">Active • %1$dm remaining</string>
+    <string name="widget_status_locked">Strict Locked • %1$dm remaining</string>
+    <string name="widget_action_start">Start</string>
+    <string name="widget_action_stop">Stop</string>
+    <string name="widget_action_locked">Locked</string>
+    <string name="widget_action_pick">Pick</string>
+    <string name="widget_toggle_cd">Toggle Quick Block</string>
+
+    <string name="tile_quick_block_label">Quick Block</string>
+    <string name="tile_quick_block_inactive_subtitle">Tap to block 30m</string>
+
+    <!-- Feed Blocking -->
+    <string name="feed_blocking_title">Feed Blocking</string>
+    <string name="feed_blocking_subtitle">Block short-video feeds inside apps while keeping messages, search, and subscriptions usable.</string>
+    <string name="feed_blocked_toast">Reels blocked</string>
+    <string name="feed_allow_dms_title">Allow Reels from DMs</string>
+    <string name="feed_allow_dms_subtitle">Keep clips shared in Direct Messages and chats viewable while blocking the main Reels, Shorts &amp; Spotlight tabs.</string>
+    <string name="feed_import_json_button">Import Selector JSON</string>
+    <string name="feed_reset_json_button">Restore Default JSON</string>
+    <string name="feed_view_json_button">View / Edit JSON</string>
+</resources>
