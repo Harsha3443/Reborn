@@ -23,15 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
 import com.harsha.reborn.ui.theme.LocalRebornReduceMotion
-import com.harsha.reborn.ui.theme.OrbAmber
-import com.harsha.reborn.ui.theme.OrbOrange
-import com.harsha.reborn.ui.theme.OrbViolet
 import com.harsha.reborn.ui.theme.RebornMotion
 
 /**
  * Full-bleed Liquid Glass ambient backdrop:
- * - Deep navy (#0A0E1A) to dark indigo (#141B34) vertical gradient (or AMOLED / Light variants).
- * - Three soft color orbs (amber #FFB347, orange #FF6B35, violet #6C5CE7) slowly drifting.
+ * - Deep burgundy (#0D0609 -> #1A0A10) vertical gradient (or AMOLED / Light variants).
+ * - Three soft burgundy color orbs slowly drifting.
  * - Real Modifier.blur (RenderEffect) on Android 12+ (API 31+) applied strictly to the orb layer
  *   so foreground text remains razor-sharp, with smooth radial fallbacks on older versions.
  */
@@ -88,43 +85,43 @@ fun LiquidGlassBackdrop(
             val scale = tokens.orbAlphaScale
             val minDim = minOf(w, h)
 
-            // Orb 1: Amber top-left drifting gently
+            // Orb 1: Light burgundy top-left drifting gently
             val orb1Center = Offset(
                 x = w * (0.14f + 0.14f * driftProgress),
                 y = h * (0.12f + 0.08f * (1f - driftProgress)),
             )
             val orb1Radius = minDim * 0.46f
             drawOrb(
-                color = OrbAmber,
+                color = tokens.orbPrimary,
                 center = orb1Center,
                 radius = orb1Radius,
-                peakAlpha = (if (useRealBlur) 0.24f else 0.15f) * scale,
+                peakAlpha = (if (useRealBlur) 0.18f else 0.11f) * scale,
             )
 
-            // Orb 2: Violet mid-right drifting oppositely
+            // Orb 2: Deep burgundy mid-right drifting oppositely
             val orb2Center = Offset(
                 x = w * (0.88f - 0.16f * driftProgress),
                 y = h * (0.42f + 0.12f * driftProgress),
             )
             val orb2Radius = minDim * 0.56f
             drawOrb(
-                color = OrbViolet,
+                color = tokens.orbTertiary,
                 center = orb2Center,
                 radius = orb2Radius,
-                peakAlpha = (if (useRealBlur) 0.28f else 0.18f) * scale,
+                peakAlpha = (if (useRealBlur) 0.24f else 0.15f) * scale,
             )
 
-            // Orb 3: Phoenix Orange lower-left glow
+            // Orb 3: Primary burgundy lower-left glow
             val orb3Center = Offset(
                 x = w * (0.24f + 0.18f * (1f - driftProgress)),
                 y = h * (0.84f - 0.10f * driftProgress),
             )
             val orb3Radius = minDim * 0.48f
             drawOrb(
-                color = OrbOrange,
+                color = tokens.orbSecondary,
                 center = orb3Center,
                 radius = orb3Radius,
-                peakAlpha = (if (useRealBlur) 0.22f else 0.14f) * scale,
+                peakAlpha = (if (useRealBlur) 0.18f else 0.11f) * scale,
             )
         }
 

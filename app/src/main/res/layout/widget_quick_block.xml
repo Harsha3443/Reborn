@@ -33,7 +33,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@string/widget_quick_block_title"
-            android:textColor="#FFF5F7FC"
+            android:textColor="@color/text_ivory"
             android:textSize="15sp"
             android:textStyle="bold" />
 
@@ -44,7 +44,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:text="@string/widget_status_off"
-            android:textColor="#FFA6B4D0"
+            android:textColor="@color/text_mauve_mist"
             android:textSize="12sp" />
     </LinearLayout>
 
@@ -60,7 +60,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/widget_action_start"
-        android:textColor="#FFFFFFFF"
+        android:textColor="@color/text_ivory"
         android:textSize="13sp"
         android:textStyle="bold" />
 

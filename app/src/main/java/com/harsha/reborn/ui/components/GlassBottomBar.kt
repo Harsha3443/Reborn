@@ -61,8 +61,8 @@ data class GlassNavItem(
 
 /**
  * Floating Liquid Glass pill bottom navigation bar with:
- * - Translucent frosted pill container + 1dp gradient border + shadow
- * - Active Phoenix gradient highlight indicator
+ * - Translucent frosted pill container + thin gradient border + shadow
+ * - Active Burgundy gradient highlight indicator
  * - 48dp+ accessible touch targets, Material Symbols Rounded, haptics, and navigationBarsPadding
  */
 @Composable
@@ -80,7 +80,7 @@ fun GlassBottomBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
         Row(
@@ -88,14 +88,14 @@ fun GlassBottomBar(
                 .widthIn(max = 560.dp)
                 .fillMaxWidth()
                 .shadow(
-                    elevation = 16.dp,
+                    elevation = 10.dp,
                     shape = pillShape,
                     ambientColor = tokens.shadowColor,
                     spotColor = tokens.shadowColor,
                 )
                 .clip(pillShape)
                 .background(tokens.floatingBarFill, shape = pillShape)
-                .border(BorderStroke(1.dp, borderBrush), shape = pillShape)
+                .border(BorderStroke(0.75.dp, borderBrush), shape = pillShape)
                 .padding(horizontal = 6.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -138,7 +138,7 @@ private fun GlassBottomBarTab(
 
     Column(
         modifier = modifier
-            .heightIn(min = 52.dp)
+            .heightIn(min = 50.dp)
             .rebornPressScale(interactionSource = interactionSource)
             .clip(itemShape)
             .background(brush = bgBrush, shape = itemShape)
@@ -152,7 +152,7 @@ private fun GlassBottomBarTab(
                 },
             )
             .semantics { selected = item.selected }
-            .padding(horizontal = 4.dp, vertical = 6.dp)
+            .padding(horizontal = 6.dp, vertical = 6.dp)
             .testTag(item.testTag),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -189,12 +189,12 @@ fun GlassNavigationRail(
 
     Column(
         modifier = modifier
-            .padding(start = 12.dp, top = 16.dp, bottom = 16.dp)
+            .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
             .navigationBarsPadding()
-            .shadow(14.dp, shape = railShape, ambientColor = tokens.shadowColor, spotColor = tokens.shadowColor)
+            .shadow(8.dp, shape = railShape, ambientColor = tokens.shadowColor, spotColor = tokens.shadowColor)
             .clip(railShape)
             .background(tokens.floatingBarFill, shape = railShape)
-            .border(BorderStroke(1.dp, borderBrush), shape = railShape)
+            .border(BorderStroke(0.75.dp, borderBrush), shape = railShape)
             .padding(horizontal = 8.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),

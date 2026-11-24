@@ -80,12 +80,9 @@ import com.harsha.reborn.ui.components.GlassCard
 import com.harsha.reborn.ui.components.GlassPillBadge
 import com.harsha.reborn.ui.components.GlassPrimaryButton
 import com.harsha.reborn.ui.components.PhoenixProgressRing
+import com.harsha.reborn.ui.components.glassTextButtonColors
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
 import com.harsha.reborn.ui.theme.LocalRebornReduceMotion
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixGradientColors
-import com.harsha.reborn.ui.theme.PhoenixOrange
-import com.harsha.reborn.ui.theme.StatusHealthy
 
 private const val TOTAL_STEPS = 6 // 0 = Welcome, 1..5 = 5 permissions
 
@@ -167,6 +164,7 @@ fun OnboardingScreen(
 
                 TextButton(
                     onClick = { viewModel.completeOnboarding(onFinished) },
+                    colors = glassTextButtonColors(),
                     modifier = Modifier.testTag("onboarding_skip_button"),
                 ) {
                     Text("Skip")
@@ -175,7 +173,7 @@ fun OnboardingScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Frosted Phoenix gradient progress bar
+            // Frosted Burgundy gradient progress bar
             val progress = ((step + 1).toFloat() / TOTAL_STEPS.toFloat()).coerceIn(0f, 1f)
             Box(
                 modifier = Modifier
@@ -190,7 +188,7 @@ fun OnboardingScreen(
                         .fillMaxWidth(progress)
                         .height(8.dp)
                         .clip(RoundedCornerShape(50))
-                        .background(Brush.horizontalGradient(PhoenixGradientColors)),
+                        .background(Brush.horizontalGradient(tokens.accentGradient)),
                 )
             }
 
@@ -283,6 +281,7 @@ fun OnboardingScreen(
 private fun WelcomeStepContent(
     onOpenPrivacyDisclosure: () -> Unit,
 ) {
+    val tokens = LocalRebornGlassTokens.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -303,8 +302,8 @@ private fun WelcomeStepContent(
                     .background(
                         Brush.radialGradient(
                             colors = listOf(
-                                PhoenixOrange.copy(alpha = 0.28f),
-                                PhoenixAmber.copy(alpha = 0.10f),
+                                tokens.accentGradient.first().copy(alpha = 0.28f),
+                                tokens.accentText.copy(alpha = 0.12f),
                                 Color.Transparent,
                             )
                         )
@@ -332,19 +331,19 @@ private fun WelcomeStepContent(
         Text(
             text = stringResource(id = R.string.app_tagline),
             style = MaterialTheme.typography.titleMedium,
-            color = PhoenixAmber,
+            color = tokens.accentText,
         )
 
         Spacer(modifier = Modifier.height(18.dp))
 
         GlassPillBadge(
-            containerColor = StatusHealthy.copy(alpha = 0.14f),
-            borderColor = StatusHealthy.copy(alpha = 0.45f),
+            containerColor = tokens.statusHealthy.copy(alpha = 0.14f),
+            borderColor = tokens.statusHealthy.copy(alpha = 0.45f),
         ) {
             Icon(
                 imageVector = Icons.Rounded.Shield,
                 contentDescription = null,
-                tint = StatusHealthy,
+                tint = tokens.statusHealthy,
                 modifier = Modifier.size(18.dp),
             )
             Text(
@@ -375,6 +374,7 @@ private fun WelcomeStepContent(
                 )
                 TextButton(
                     onClick = onOpenPrivacyDisclosure,
+                    colors = glassTextButtonColors(),
                     modifier = Modifier.testTag("onboarding_privacy_link"),
                 ) {
                     Icon(
@@ -399,6 +399,7 @@ private fun PermissionStepContent(
     onOpenOemSettings: () -> Unit,
     onOpenPrivacyDisclosure: () -> Unit,
 ) {
+    val tokens = LocalRebornGlassTokens.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -411,9 +412,9 @@ private fun PermissionStepContent(
             size = 94.dp,
             strokeWidth = 6.dp,
             sweepColors = if (item.isGranted) {
-                listOf(StatusHealthy, StatusHealthy)
+                listOf(tokens.statusHealthy, tokens.statusHealthy)
             } else {
-                PhoenixGradientColors
+                tokens.accentGradient
             },
         ) {
             Box(
@@ -422,9 +423,9 @@ private fun PermissionStepContent(
                     .clip(CircleShape)
                     .background(
                         if (item.isGranted) {
-                            StatusHealthy.copy(alpha = 0.16f)
+                            tokens.statusHealthy.copy(alpha = 0.16f)
                         } else {
-                            PhoenixOrange.copy(alpha = 0.16f)
+                            tokens.accentTintFill
                         }
                     ),
                 contentAlignment = Alignment.Center,
@@ -432,7 +433,7 @@ private fun PermissionStepContent(
                 Icon(
                     imageVector = permissionIcon(item.type),
                     contentDescription = null,
-                    tint = if (item.isGranted) StatusHealthy else PhoenixAmber,
+                    tint = if (item.isGranted) tokens.statusHealthy else tokens.accentText,
                     modifier = Modifier.size(36.dp),
                 )
             }
@@ -449,14 +450,14 @@ private fun PermissionStepContent(
         Spacer(modifier = Modifier.height(10.dp))
 
         GlassPillBadge(
-            containerColor = if (item.isGranted) StatusHealthy.copy(alpha = 0.16f) else null,
-            borderColor = if (item.isGranted) StatusHealthy.copy(alpha = 0.5f) else null,
+            containerColor = if (item.isGranted) tokens.statusHealthy.copy(alpha = 0.16f) else null,
+            borderColor = if (item.isGranted) tokens.statusHealthy.copy(alpha = 0.5f) else null,
         ) {
             if (item.isGranted) {
                 Icon(
                     imageVector = Icons.Rounded.CheckCircle,
                     contentDescription = null,
-                    tint = StatusHealthy,
+                    tint = tokens.statusHealthy,
                     modifier = Modifier.size(16.dp),
                 )
             }
@@ -469,7 +470,7 @@ private fun PermissionStepContent(
                     "Recommended for reliability"
                 },
                 style = MaterialTheme.typography.labelMedium,
-                color = if (item.isGranted) StatusHealthy else MaterialTheme.colorScheme.onSurface,
+                color = if (item.isGranted) tokens.statusHealthy else MaterialTheme.colorScheme.onSurface,
             )
         }
 
@@ -485,7 +486,7 @@ private fun PermissionStepContent(
                 Text(
                     text = "Why Reborn needs this",
                     style = MaterialTheme.typography.titleSmall,
-                    color = PhoenixAmber,
+                    color = tokens.accentText,
                 )
                 Text(
                     text = item.whyNeeded,
@@ -516,6 +517,7 @@ private fun PermissionStepContent(
                 if (item.type == RebornPermissionType.ACCESSIBILITY) {
                     TextButton(
                         onClick = onOpenPrivacyDisclosure,
+                        colors = glassTextButtonColors(),
                         modifier = Modifier.testTag("accessibility_disclosure_button"),
                     ) {
                         Text("How Accessibility data is handled")
@@ -535,7 +537,7 @@ private fun PermissionStepContent(
                     Text(
                         text = "$oemName Tip",
                         style = MaterialTheme.typography.titleSmall,
-                        color = PhoenixAmber,
+                        color = tokens.accentText,
                     )
                     oemSteps.forEach { step ->
                         Text(
@@ -546,6 +548,7 @@ private fun PermissionStepContent(
                     }
                     TextButton(
                         onClick = onOpenOemSettings,
+                        colors = glassTextButtonColors(),
                         modifier = Modifier.testTag("onboarding_oem_battery_button"),
                     ) {
                         Text("Open Manufacturer Battery Settings")

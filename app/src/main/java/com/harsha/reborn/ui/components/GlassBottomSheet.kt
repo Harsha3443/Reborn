@@ -46,7 +46,7 @@ fun GlassBottomSheet(
         shape = sheetShape,
         containerColor = tokens.modalSheetFill,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        scrimColor = Color.Black.copy(alpha = 0.56f),
+        scrimColor = tokens.modalScrim,
         dragHandle = {
             Box(
                 modifier = Modifier

@@ -36,15 +36,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.harsha.reborn.ui.components.GlassCard
 import com.harsha.reborn.ui.components.glassTopAppBarColors
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixOrange
-import com.harsha.reborn.ui.theme.StatusHealthy
+import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrivacyDisclosureScreen(
     onBack: () -> Unit,
 ) {
+    val tokens = LocalRebornGlassTokens.current
     Scaffold(
         containerColor = Color.Transparent,
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -81,7 +80,7 @@ fun PrivacyDisclosureScreen(
             ) {
                 DisclosureCard(
                     icon = Icons.Rounded.Lock,
-                    iconTint = StatusHealthy,
+                    iconTint = tokens.statusHealthy,
                     title = "100% Offline by Architecture",
                     bullets = listOf(
                         "Reborn does NOT declare android.permission.INTERNET in its manifest.",
@@ -92,7 +91,7 @@ fun PrivacyDisclosureScreen(
 
                 DisclosureCard(
                     icon = Icons.Rounded.Visibility,
-                    iconTint = PhoenixOrange,
+                    iconTint = tokens.accentText,
                     title = "What AccessibilityService Is Used For",
                     bullets = listOf(
                         "Detects foreground app transitions (TYPE_WINDOW_STATE_CHANGED) so Reborn knows when a blocked app opens.",
@@ -103,7 +102,7 @@ fun PrivacyDisclosureScreen(
 
                 DisclosureCard(
                     icon = Icons.Rounded.VisibilityOff,
-                    iconTint = PhoenixAmber,
+                    iconTint = tokens.accentText,
                     title = "What Reborn Never Collects or Reads",
                     bullets = listOf(
                         "Never reads passwords, PINs entered into other apps, banking fields, or private chats.",

@@ -28,7 +28,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Air
+import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.HourglassTop
@@ -40,12 +41,12 @@ import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.VerifiedUser
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -61,7 +62,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
@@ -91,12 +91,10 @@ import com.harsha.reborn.ui.components.PhoenixProgressRing
 import com.harsha.reborn.ui.components.glassFilterChipBorder
 import com.harsha.reborn.ui.components.glassFilterChipColors
 import com.harsha.reborn.ui.components.glassOutlinedTextFieldColors
+import com.harsha.reborn.ui.components.glassSliderColors
 import com.harsha.reborn.ui.components.glassSwitchColors
+import com.harsha.reborn.ui.components.glassTextButtonColors
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixGradientColors
-import com.harsha.reborn.ui.theme.PhoenixOrange
-import com.harsha.reborn.ui.theme.StatusHealthy
 import com.harsha.reborn.ui.theme.rebornPressScale
 import kotlinx.coroutines.delay
 import java.util.Locale
@@ -107,6 +105,8 @@ fun RulesScreen(
     onOpenFriction: () -> Unit = {},
     onOpenStrictMode: () -> Unit = {},
     onOpenFeedBlocking: () -> Unit = {},
+    onOpenAppPicker: () -> Unit = {},
+    selectedAppsCount: Int = 0,
     modifier: Modifier = Modifier,
     viewModel: RulesViewModel = hiltViewModel(),
 ) {
@@ -142,42 +142,34 @@ fun RulesScreen(
                 .fillMaxSize()
                 .widthIn(max = 600.dp),
         ) {
-            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
+            Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 12.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Blocking Rules",
-                            style = MaterialTheme.typography.headlineMedium,
-                        )
-                        Text(
-                            text = "Quick blocks, schedules, limits, allowlist & smart filters",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Blocking Rules",
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
                     GlassButton(
-                        onClick = onOpenFriction,
+                        onClick = onOpenAppPicker,
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
-                        modifier = Modifier.testTag("rules_open_friction_button"),
+                        modifier = Modifier.testTag("rules_open_apps_button"),
                     ) {
                         Icon(
-                            imageVector = Icons.Rounded.Air,
-                            contentDescription = "Mindful Friction",
-                            tint = PhoenixAmber,
+                            imageVector = Icons.Rounded.Apps,
+                            contentDescription = "Selected Apps",
+                            tint = tokens.accentText,
                             modifier = Modifier.size(18.dp),
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Friction")
+                        Text(if (selectedAppsCount > 0) "Apps ($selectedAppsCount)" else "Apps")
                     }
                 }
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
-                // Glass Pill Tab Strip
+                // Calm segmented pill strip
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -187,7 +179,7 @@ fun RulesScreen(
                         val interactionSource = remember { MutableInteractionSource() }
                         val pillShape = RoundedCornerShape(22.dp)
                         val bgBrush = if (isSelected) {
-                            Brush.linearGradient(PhoenixGradientColors)
+                            Brush.linearGradient(tokens.accentGradient)
                         } else {
                             SolidColor(tokens.cardSubtleFill)
                         }
@@ -197,12 +189,9 @@ fun RulesScreen(
                             MaterialTheme.colorScheme.onSurface
                         }
                         val border = if (isSelected) {
-                            BorderStroke(1.dp, Color.White.copy(alpha = 0.4f))
+                            BorderStroke(0.75.dp, tokens.selectedBorderTopLeft)
                         } else {
-                            BorderStroke(
-                                1.dp,
-                                Brush.linearGradient(listOf(tokens.borderTopLeft, tokens.borderBottomRight)),
-                            )
+                            BorderStroke(0.75.dp, tokens.borderTopLeft)
                         }
 
                         Box(
@@ -242,10 +231,10 @@ fun RulesScreen(
                 GlassCard(
                     cornerRadius = 20.dp,
                     elevated = true,
-                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
                         .testTag("rules_feedback_banner"),
                 ) {
                     Row(
@@ -258,7 +247,10 @@ fun RulesScreen(
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f),
                         )
-                        TextButton(onClick = viewModel::clearFeedback) {
+                        TextButton(
+                            onClick = viewModel::clearFeedback,
+                            colors = glassTextButtonColors(),
+                        ) {
                             Text("OK")
                         }
                     }
@@ -268,11 +260,11 @@ fun RulesScreen(
             if (state.isStrictSettingsLocked) {
                 GlassCard(
                     cornerRadius = 20.dp,
-                    tintColor = PhoenixOrange.copy(alpha = 0.14f),
-                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                    tintColor = tokens.accentTintFill,
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
                         .testTag("rules_strict_locked_banner"),
                 ) {
                     Row(
@@ -288,15 +280,18 @@ fun RulesScreen(
                             Icon(
                                 imageVector = Icons.Rounded.Lock,
                                 contentDescription = null,
-                                tint = PhoenixOrange,
+                                tint = tokens.accentText,
                                 modifier = Modifier.size(18.dp),
                             )
                             Text(
-                                text = "Strict Mode locked — active rules cannot be weakened or turned off.",
+                                text = "Strict Mode locked — active rules cannot be weakened.",
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
-                        TextButton(onClick = onOpenStrictMode) {
+                        TextButton(
+                            onClick = onOpenStrictMode,
+                            colors = glassTextButtonColors(),
+                        ) {
                             Text("View")
                         }
                     }
@@ -316,6 +311,7 @@ fun RulesScreen(
                     state = state,
                     onStart = viewModel::startQuickBlock,
                     onStop = viewModel::stopQuickBlock,
+                    onOpenFriction = onOpenFriction,
                 )
                 RulesTab.SCHEDULES -> SchedulesSection(
                     state = state,
@@ -366,7 +362,9 @@ private fun QuickBlockSection(
     state: RulesUiState,
     onStart: (Set<String>, Int) -> Unit,
     onStop: () -> Unit,
+    onOpenFriction: () -> Unit,
 ) {
+    val tokens = LocalRebornGlassTokens.current
     val quick = state.snapshot.quickBlock
     val isActiveNow = quick != null && quick.isActive && state.nowEpochMs < quick.endTimeEpochMs
     var selectedPackages by remember(state.defaultSelectedPackages) {
@@ -392,8 +390,8 @@ private fun QuickBlockSection(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 104.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 120.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         if (isActiveNow && quick != null) {
             item {
@@ -404,38 +402,38 @@ private fun QuickBlockSection(
                 val remProgress = ((quick.endTimeEpochMs - state.nowEpochMs).toFloat() / totalMs.toFloat()).coerceIn(0f, 1f)
 
                 GlassCard(
-                    cornerRadius = 30.dp,
+                    cornerRadius = 28.dp,
                     elevated = true,
-                    tintColor = PhoenixOrange.copy(alpha = 0.14f),
+                    tintColor = tokens.accentTintFill,
                     contentPadding = PaddingValues(20.dp),
                     modifier = Modifier.testTag("quick_block_active_card"),
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             PhoenixProgressRing(
                                 progress = remProgress,
-                                size = 62.dp,
-                                strokeWidth = 6.dp,
+                                size = 60.dp,
+                                strokeWidth = 5.5.dp,
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Timer,
                                     contentDescription = null,
-                                    tint = PhoenixAmber,
-                                    modifier = Modifier.size(26.dp),
+                                    tint = tokens.accentText,
+                                    modifier = Modifier.size(24.dp),
                                 )
                             }
                             Column {
                                 Text(
                                     text = "Quick Block Active",
                                     style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = PhoenixAmber,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = tokens.accentText,
                                 )
                                 Text(
-                                    text = String.format(Locale.US, "%02d:%02d remaining", mins, secs),
+                                    text = String.format(Locale.US, "%02d:%02d left", mins, secs),
                                     style = MaterialTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -444,7 +442,7 @@ private fun QuickBlockSection(
 
                         Text(
                             text = "Blocking ${quick.packageNames.size} selected app${if (quick.packageNames.size == 1) "" else "s"}.",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
 
@@ -460,8 +458,8 @@ private fun QuickBlockSection(
                                     rem / 60L,
                                     rem % 60L,
                                 ),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = PhoenixAmber,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = tokens.accentText,
                             )
                         }
 
@@ -490,18 +488,29 @@ private fun QuickBlockSection(
         }
 
         item {
-            GlassCard(cornerRadius = 28.dp) {
-                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Text(
-                        text = "Start a Focus Burst",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        text = "Duration: $durationMinutes minutes",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = PhoenixAmber,
-                    )
+            GlassCard(
+                cornerRadius = 26.dp,
+                contentPadding = PaddingValues(20.dp),
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "Focus Burst",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = "$durationMinutes min",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = tokens.accentText,
+                        )
+                    }
+
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -522,23 +531,45 @@ private fun QuickBlockSection(
                             )
                         }
                     }
+
                     Slider(
                         value = durationMinutes.toFloat(),
                         onValueChange = { durationMinutes = (it / 5f).roundToInt().coerceAtLeast(1) * 5 },
                         valueRange = 5f..180f,
-                        colors = SliderDefaults.colors(
-                            thumbColor = PhoenixAmber,
-                            activeTrackColor = PhoenixOrange,
-                        ),
+                        colors = glassSliderColors(),
                     )
-                    GlassButton(
-                        onClick = { showAppSelector = true },
+
+                    HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .clickable { showAppSelector = true }
+                            .padding(vertical = 8.dp)
                             .testTag("quick_block_choose_apps_button"),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("Apps to Block (${selectedPackages.size} chosen)")
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Apps to block",
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                            Text(
+                                text = "${selectedPackages.size} selected",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Rounded.ChevronRight,
+                            contentDescription = "Choose apps to block",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
+
                     GlassPrimaryButton(
                         onClick = { onStart(selectedPackages, durationMinutes) },
                         enabled = selectedPackages.isNotEmpty(),
@@ -554,6 +585,30 @@ private fun QuickBlockSection(
                 }
             }
         }
+
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .clickable(onClick = onOpenFriction)
+                    .padding(horizontal = 4.dp, vertical = 8.dp)
+                    .testTag("rules_open_friction_button"),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Mindful Friction (${state.frictionSettings.pauseSeconds}s pause)",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Icon(
+                    imageVector = Icons.Rounded.ChevronRight,
+                    contentDescription = "Open Mindful Friction",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }
 
@@ -567,6 +622,7 @@ private fun SchedulesSection(
     var editingProfile by remember { mutableStateOf<ScheduleProfile?>(null) }
     var isCreating by remember { mutableStateOf(false) }
     val view = LocalView.current
+    val tokens = LocalRebornGlassTokens.current
 
     if (isCreating || editingProfile != null) {
         ScheduleEditorDialog(
@@ -587,11 +643,11 @@ private fun SchedulesSection(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 104.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 120.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         item {
-            GlassButton(
+            GlassPrimaryButton(
                 onClick = { isCreating = true },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -603,85 +659,118 @@ private fun SchedulesSection(
             }
         }
 
-        items(state.snapshot.schedules, key = { it.id }) { profile ->
-            GlassCard(
-                cornerRadius = 26.dp,
-                contentPadding = PaddingValues(16.dp),
-                modifier = Modifier.testTag("schedule_card_${profile.id}"),
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Schedule,
-                                contentDescription = null,
-                                tint = PhoenixAmber,
-                            )
-                            Column {
-                                Text(
-                                    text = profile.name,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                                Text(
-                                    text = "${RuleEvaluator.formatMinute(profile.startMinuteOfDay)} – ${RuleEvaluator.formatMinute(profile.endMinuteOfDay)}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+        if (state.snapshot.schedules.isEmpty()) {
+            item {
+                GlassCard(cornerRadius = 26.dp, contentPadding = PaddingValues(18.dp)) {
+                    Text(
+                        text = "Create recurring time blocks like Work Hours or Bedtime to shield distracting apps automatically.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        } else {
+            item {
+                GlassCard(
+                    cornerRadius = 26.dp,
+                    contentPadding = PaddingValues(0.dp),
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        state.snapshot.schedules.forEachIndexed { idx, profile ->
+                            if (idx > 0) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    thickness = 0.5.dp,
+                                    color = tokens.borderBottomRight,
                                 )
                             }
-                        }
-                        Switch(
-                            checked = profile.isEnabled,
-                            colors = glassSwitchColors(),
-                            onCheckedChange = {
-                                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                                onToggle(profile.id, it)
-                            },
-                            modifier = Modifier.testTag("schedule_switch_${profile.id}"),
-                        )
-                    }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .testTag("schedule_card_${profile.id}"),
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                        modifier = Modifier.weight(1f),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Schedule,
+                                            contentDescription = null,
+                                            tint = tokens.accentText,
+                                        )
+                                        Column {
+                                            Text(
+                                                text = profile.name,
+                                                style = MaterialTheme.typography.titleMedium,
+                                                fontWeight = FontWeight.SemiBold,
+                                            )
+                                            Text(
+                                                text = "${RuleEvaluator.formatMinute(profile.startMinuteOfDay)} – ${RuleEvaluator.formatMinute(profile.endMinuteOfDay)}",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    }
+                                    Switch(
+                                        checked = profile.isEnabled,
+                                        colors = glassSwitchColors(),
+                                        onCheckedChange = {
+                                            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                                            onToggle(profile.id, it)
+                                        },
+                                        modifier = Modifier.testTag("schedule_switch_${profile.id}"),
+                                    )
+                                }
 
-                    Text(
-                        text = "${formatDaysSummary(profile.daysOfWeek)} • ${profile.packageNames.size} apps",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (profile.packageNames.isEmpty()) {
-                            PhoenixAmber
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
-                    ) {
-                        TextButton(
-                            onClick = { editingProfile = profile },
-                            modifier = Modifier.testTag("schedule_edit_${profile.id}"),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Edit,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp),
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Edit")
-                        }
-                        IconButton(
-                            onClick = { onDelete(profile.id) },
-                            modifier = Modifier.testTag("schedule_delete_${profile.id}"),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.DeleteOutline,
-                                contentDescription = "Delete schedule",
-                            )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = "${formatDaysSummary(profile.daysOfWeek)} • ${profile.packageNames.size} apps",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (profile.packageNames.isEmpty()) {
+                                            tokens.statusWarning
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        TextButton(
+                                            onClick = { editingProfile = profile },
+                                            colors = glassTextButtonColors(),
+                                            modifier = Modifier.testTag("schedule_edit_${profile.id}"),
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Edit,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp),
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text("Edit")
+                                        }
+                                        IconButton(
+                                            onClick = { onDelete(profile.id) },
+                                            modifier = Modifier.testTag("schedule_delete_${profile.id}"),
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.DeleteOutline,
+                                                contentDescription = "Delete schedule",
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -703,6 +792,7 @@ private fun LimitsSection(
     var showAddDailyLimit by remember { mutableStateOf(false) }
     var showAddLaunchLimit by remember { mutableStateOf(false) }
     val view = LocalView.current
+    val tokens = LocalRebornGlassTokens.current
 
     if (showAddDailyLimit) {
         DailyLimitEditorDialog(
@@ -729,86 +819,91 @@ private fun LimitsSection(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 104.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 120.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            GlassCard(
+                cornerRadius = 26.dp,
+                contentPadding = PaddingValues(18.dp),
             ) {
-                Text("Daily Time Limits", style = MaterialTheme.typography.titleMedium)
-                TextButton(
-                    onClick = { showAddDailyLimit = true },
-                    modifier = Modifier.testTag("add_daily_limit_button"),
-                ) {
-                    Icon(imageVector = Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add Time Limit")
-                }
-            }
-        }
-
-        if (state.snapshot.dailyTimeLimits.isEmpty()) {
-            item {
-                GlassCard(cornerRadius = 22.dp, contentPadding = PaddingValues(16.dp)) {
-                    Text(
-                        text = "Cap total minutes per day for one app or an entire group (like Social Media).",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        } else {
-            items(state.snapshot.dailyTimeLimits, key = { "time_${it.id}" }) { rule ->
-                val usedMin = rule.packageNames.sumOf { pkg ->
-                    state.usageSnapshot.dailyMinutesByPackage[pkg] ?: 0
-                }
-                val progress = (usedMin.toFloat() / rule.dailyLimitMinutes.coerceAtLeast(1)).coerceIn(0f, 1f)
-                GlassCard(cornerRadius = 24.dp, contentPadding = PaddingValues(16.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        PhoenixProgressRing(
-                            progress = progress,
-                            size = 46.dp,
-                            strokeWidth = 4.5.dp,
+                        Text("Daily Time Limits", style = MaterialTheme.typography.titleMedium)
+                        TextButton(
+                            onClick = { showAddDailyLimit = true },
+                            colors = glassTextButtonColors(),
+                            modifier = Modifier.testTag("add_daily_limit_button"),
                         ) {
-                            Text(
-                                text = "${(progress * 100).roundToInt()}%",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                            )
+                            Icon(imageVector = Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Add")
                         }
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(rule.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                            val dimSuffix = if (
-                                state.snapshot.smartRulesConfig.grayscaleDimOnLimitEnabled ||
-                                rule.afterLimitAction == DailyLimitAfterAction.GRAYSCALE_DIM
-                            ) {
-                                " • Grayscale Dim"
-                            } else {
-                                ""
-                            }
-                            Text(
-                                text = "$usedMin / ${rule.dailyLimitMinutes} min today • ${rule.packageNames.size} apps$dimSuffix",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Switch(
-                            checked = rule.isEnabled,
-                            colors = glassSwitchColors(),
-                            onCheckedChange = {
-                                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                                onToggleDailyLimit(rule.id, it)
-                            },
+                    }
+
+                    if (state.snapshot.dailyTimeLimits.isEmpty()) {
+                        Text(
+                            text = "Cap total minutes per day for one app or an entire group.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        IconButton(onClick = { onDeleteDailyLimit(rule.id) }) {
-                            Icon(Icons.Rounded.DeleteOutline, contentDescription = "Delete limit")
+                    } else {
+                        state.snapshot.dailyTimeLimits.forEachIndexed { idx, rule ->
+                            if (idx > 0) {
+                                HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+                            }
+                            val usedMin = rule.packageNames.sumOf { pkg ->
+                                state.usageSnapshot.dailyMinutesByPackage[pkg] ?: 0
+                            }
+                            val progress = (usedMin.toFloat() / rule.dailyLimitMinutes.coerceAtLeast(1)).coerceIn(0f, 1f)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                PhoenixProgressRing(
+                                    progress = progress,
+                                    size = 44.dp,
+                                    strokeWidth = 4.dp,
+                                ) {
+                                    Text(
+                                        text = "${(progress * 100).roundToInt()}%",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(rule.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                                    val dimSuffix = if (
+                                        state.snapshot.smartRulesConfig.grayscaleDimOnLimitEnabled ||
+                                        rule.afterLimitAction == DailyLimitAfterAction.GRAYSCALE_DIM
+                                    ) {
+                                        " • Grayscale Dim"
+                                    } else {
+                                        ""
+                                    }
+                                    Text(
+                                        text = "$usedMin / ${rule.dailyLimitMinutes}m • ${rule.packageNames.size} apps$dimSuffix",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                Switch(
+                                    checked = rule.isEnabled,
+                                    colors = glassSwitchColors(),
+                                    onCheckedChange = {
+                                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                                        onToggleDailyLimit(rule.id, it)
+                                    },
+                                )
+                                IconButton(onClick = { onDeleteDailyLimit(rule.id) }) {
+                                    Icon(Icons.Rounded.DeleteOutline, contentDescription = "Delete limit")
+                                }
+                            }
                         }
                     }
                 }
@@ -816,74 +911,78 @@ private fun LimitsSection(
         }
 
         item {
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            GlassCard(
+                cornerRadius = 26.dp,
+                contentPadding = PaddingValues(18.dp),
             ) {
-                Text("Daily Launch Limits", style = MaterialTheme.typography.titleMedium)
-                TextButton(
-                    onClick = { showAddLaunchLimit = true },
-                    modifier = Modifier.testTag("add_launch_limit_button"),
-                ) {
-                    Icon(imageVector = Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add Launch Limit")
-                }
-            }
-        }
-
-        if (state.snapshot.launchLimits.isEmpty()) {
-            item {
-                GlassCard(cornerRadius = 22.dp, contentPadding = PaddingValues(16.dp)) {
-                    Text(
-                        text = "Restrict how many times an app can be opened per day (e.g. max 5 opens/day).",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        } else {
-            items(state.snapshot.launchLimits, key = { "launch_${it.id}" }) { rule ->
-                val opensToday = (state.usageSnapshot.dailyLaunchesByPackage[rule.packageName] ?: 0)
-                    .coerceAtMost(rule.maxLaunchesPerDay)
-                val progress = (opensToday.toFloat() / rule.maxLaunchesPerDay.coerceAtLeast(1)).coerceIn(0f, 1f)
-                GlassCard(cornerRadius = 24.dp, contentPadding = PaddingValues(16.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        PhoenixProgressRing(
-                            progress = progress,
-                            size = 44.dp,
-                            strokeWidth = 4.dp,
+                        Text("Daily Launch Limits", style = MaterialTheme.typography.titleMedium)
+                        TextButton(
+                            onClick = { showAddLaunchLimit = true },
+                            colors = glassTextButtonColors(),
+                            modifier = Modifier.testTag("add_launch_limit_button"),
                         ) {
-                            Text(
-                                text = "$opensToday",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                            )
+                            Icon(imageVector = Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Add")
                         }
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(rule.appLabel, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                            Text(
-                                text = "$opensToday / ${rule.maxLaunchesPerDay} opens today",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Switch(
-                            checked = rule.isEnabled,
-                            colors = glassSwitchColors(),
-                            onCheckedChange = {
-                                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                                onToggleLaunchLimit(rule.id, it)
-                            },
+                    }
+
+                    if (state.snapshot.launchLimits.isEmpty()) {
+                        Text(
+                            text = "Restrict how many times an app can be opened per day.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        IconButton(onClick = { onDeleteLaunchLimit(rule.id) }) {
-                            Icon(Icons.Rounded.DeleteOutline, contentDescription = "Delete launch limit")
+                    } else {
+                        state.snapshot.launchLimits.forEachIndexed { idx, rule ->
+                            if (idx > 0) {
+                                HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+                            }
+                            val opensToday = (state.usageSnapshot.dailyLaunchesByPackage[rule.packageName] ?: 0)
+                                .coerceAtMost(rule.maxLaunchesPerDay)
+                            val progress = (opensToday.toFloat() / rule.maxLaunchesPerDay.coerceAtLeast(1)).coerceIn(0f, 1f)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                PhoenixProgressRing(
+                                    progress = progress,
+                                    size = 44.dp,
+                                    strokeWidth = 4.dp,
+                                ) {
+                                    Text(
+                                        text = "$opensToday",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(rule.appLabel, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                                    Text(
+                                        text = "$opensToday / ${rule.maxLaunchesPerDay} opens today",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                Switch(
+                                    checked = rule.isEnabled,
+                                    colors = glassSwitchColors(),
+                                    onCheckedChange = {
+                                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                                        onToggleLaunchLimit(rule.id, it)
+                                    },
+                                )
+                                IconButton(onClick = { onDeleteLaunchLimit(rule.id) }) {
+                                    Icon(Icons.Rounded.DeleteOutline, contentDescription = "Delete launch limit")
+                                }
+                            }
                         }
                     }
                 }
@@ -907,17 +1006,18 @@ private fun AllowlistSection(
             .filter { q.isEmpty() || it.label.lowercase().contains(q) }
     }
     val view = LocalView.current
+    val tokens = LocalRebornGlassTokens.current
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 104.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 120.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
             GlassCard(
                 cornerRadius = 26.dp,
-                tintColor = if (state.snapshot.allowlist.isEnabled) StatusHealthy.copy(alpha = 0.14f) else null,
-                contentPadding = PaddingValues(16.dp),
+                tintColor = if (state.snapshot.allowlist.isEnabled) tokens.statusHealthy.copy(alpha = 0.12f) else null,
+                contentPadding = PaddingValues(18.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -927,7 +1027,7 @@ private fun AllowlistSection(
                     Icon(
                         imageVector = Icons.Rounded.VerifiedUser,
                         contentDescription = null,
-                        tint = if (state.snapshot.allowlist.isEnabled) StatusHealthy else PhoenixOrange,
+                        tint = if (state.snapshot.allowlist.isEnabled) tokens.statusHealthy else tokens.accentText,
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
@@ -936,7 +1036,7 @@ private fun AllowlistSection(
                             fontWeight = FontWeight.SemiBold,
                         )
                         Text(
-                            text = "Blocks every app except the ${allowed.size} you allow below. Phone, Emergency, and Launcher stay protected.",
+                            text = "Blocks every app except the ${allowed.size} you allow below.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -968,15 +1068,13 @@ private fun AllowlistSection(
 
         items(filteredApps, key = { it.packageName }) { app ->
             val isAllowed = allowed.contains(app.packageName)
-            GlassCard(
-                onClick = { onToggleApp(app, isAllowed) },
-                cornerRadius = 22.dp,
-                tintColor = if (isAllowed) StatusHealthy.copy(alpha = 0.10f) else null,
-                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 56.dp)
+                        .clickable { onToggleApp(app, isAllowed) }
+                        .padding(horizontal = 4.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
@@ -993,6 +1091,7 @@ private fun AllowlistSection(
                         onCheckedChange = { onToggleApp(app, isAllowed) },
                     )
                 }
+                HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
             }
         }
 
@@ -1024,13 +1123,14 @@ private fun PendingDisablesQueueBanner(
     nowEpochMs: Long,
     onCancel: (Long) -> Unit,
 ) {
+    val tokens = LocalRebornGlassTokens.current
     GlassCard(
         cornerRadius = 22.dp,
-        tintColor = PhoenixOrange.copy(alpha = 0.14f),
+        tintColor = tokens.accentTintFill,
         contentPadding = PaddingValues(14.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 6.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
             .testTag("rules_pending_disables_card"),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1041,7 +1141,7 @@ private fun PendingDisablesQueueBanner(
                 Icon(
                     imageVector = Icons.Rounded.HourglassTop,
                     contentDescription = null,
-                    tint = PhoenixAmber,
+                    tint = tokens.accentText,
                     modifier = Modifier.size(18.dp),
                 )
                 Text(

@@ -2,7 +2,6 @@ package com.harsha.reborn.feature.insights
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,13 +21,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Block
-import androidx.compose.material.icons.rounded.LocalFireDepartment
-import androidx.compose.material.icons.rounded.LockOpen
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,7 +41,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -61,15 +56,10 @@ import com.harsha.reborn.core.data.model.PhoenixStreakSummary
 import com.harsha.reborn.core.data.model.UnlockPassLog
 import com.harsha.reborn.core.engine.InsightsCalculator
 import com.harsha.reborn.ui.components.GlassCard
-import com.harsha.reborn.ui.components.GlassPillBadge
 import com.harsha.reborn.ui.components.GlassPrimaryButton
 import com.harsha.reborn.ui.components.PhoenixProgressRing
 import com.harsha.reborn.ui.components.glassTopAppBarColors
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixGradientColors
-import com.harsha.reborn.ui.theme.StatusHealthy
-import com.harsha.reborn.ui.theme.StatusWarning
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -79,6 +69,7 @@ import java.time.format.DateTimeFormatter
 fun InsightsScreen(
     onBack: () -> Unit,
     onOpenPermissionHealth: () -> Unit,
+    showBackButton: Boolean = true,
     viewModel: InsightsViewModel = hiltViewModel(),
 ) {
     val snapshot by viewModel.dashboardState.collectAsStateWithLifecycle()
@@ -95,14 +86,16 @@ fun InsightsScreen(
                 colors = glassTopAppBarColors(),
                 title = { Text(stringResource(id = R.string.insights_title)) },
                 navigationIcon = {
-                    IconButton(
-                        onClick = onBack,
-                        modifier = Modifier.testTag("insights_back_button"),
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = stringResource(id = R.string.insights_back_cd),
-                        )
+                    if (showBackButton) {
+                        IconButton(
+                            onClick = onBack,
+                            modifier = Modifier.testTag("insights_back_button"),
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = stringResource(id = R.string.insights_back_cd),
+                            )
+                        }
                     }
                 },
                 actions = {
@@ -129,25 +122,22 @@ fun InsightsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .widthIn(max = 600.dp),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 120.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 item {
-                    PhoenixStreakBannerCard(streak = snapshot.streak)
+                    StreakAndTodayOverviewCard(
+                        streak = snapshot.streak,
+                        todayScreenTimeMinutes = snapshot.todayScreenTimeMinutes,
+                        blockedTodayCount = snapshot.blockedTodayCount,
+                        unlockAttemptsTodayCount = snapshot.unlockAttemptsTodayCount,
+                    )
                 }
 
                 if (!snapshot.usageAccessGranted) {
                     item {
                         UsageAccessNoticeCard(onGrantClick = onOpenPermissionHealth)
                     }
-                }
-
-                item {
-                    TodayMetricsRow(
-                        todayScreenTimeMinutes = snapshot.todayScreenTimeMinutes,
-                        blockedTodayCount = snapshot.blockedTodayCount,
-                        unlockAttemptsTodayCount = snapshot.unlockAttemptsTodayCount,
-                    )
                 }
 
                 item {
@@ -182,17 +172,18 @@ fun InsightsScreen(
                         RecentUnlockIntentNotesCard(logs = snapshot.recentUnlockReasons)
                     }
                 }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
             }
         }
     }
 }
 
 @Composable
-private fun PhoenixStreakBannerCard(streak: PhoenixStreakSummary) {
+private fun StreakAndTodayOverviewCard(
+    streak: PhoenixStreakSummary,
+    todayScreenTimeMinutes: Int,
+    blockedTodayCount: Int,
+    unlockAttemptsTodayCount: Int,
+) {
     val tokens = LocalRebornGlassTokens.current
     val cycleProgress = if (streak.daysReborn <= 0) {
         0.12f
@@ -209,7 +200,7 @@ private fun PhoenixStreakBannerCard(streak: PhoenixStreakSummary) {
             .fillMaxWidth()
             .testTag("insights_phoenix_streak_card"),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -222,20 +213,20 @@ private fun PhoenixStreakBannerCard(streak: PhoenixStreakSummary) {
                 ) {
                     PhoenixProgressRing(
                         progress = cycleProgress,
-                        size = 56.dp,
+                        size = 54.dp,
                         strokeWidth = 5.dp,
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(38.dp)
                                 .clip(CircleShape)
-                                .background(tokens.cardElevatedFill),
+                                .background(tokens.cardSubtleFill),
                             contentAlignment = Alignment.Center,
                         ) {
                             Image(
                                 painter = painterResource(id = R.drawable.ic_reborn_logo),
                                 contentDescription = "Phoenix streak emblem",
-                                modifier = Modifier.size(28.dp),
+                                modifier = Modifier.size(26.dp),
                             )
                         }
                     }
@@ -246,43 +237,83 @@ private fun PhoenixStreakBannerCard(streak: PhoenixStreakSummary) {
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            text = "Gentle Phoenix Rhythm",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-                }
-
-                if (streak.bestStreak > 0) {
-                    GlassPillBadge {
-                        Icon(
-                            imageVector = Icons.Rounded.LocalFireDepartment,
-                            contentDescription = null,
-                            tint = PhoenixAmber,
-                            modifier = Modifier.size(14.dp),
-                        )
-                        Text(
-                            text = "Best ${streak.bestStreak}d",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.SemiBold,
+                            text = if (streak.bestStreak > 0) {
+                                "Best streak: ${streak.bestStreak}d"
+                            } else {
+                                streak.encouragingSubtitle
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
             }
 
-            Text(
-                text = streak.encouragingSubtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("insights_today_metrics"),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                InsightsFlatMetric(
+                    value = InsightsCalculator.formatDurationMinutes(todayScreenTimeMinutes),
+                    label = "Screen time",
+                    modifier = Modifier.weight(1f),
+                )
+                InsightsFlatMetric(
+                    value = blockedTodayCount.toString(),
+                    label = "Blocked",
+                    valueColor = tokens.accentText,
+                    modifier = Modifier.weight(1f),
+                )
+                InsightsFlatMetric(
+                    value = unlockAttemptsTodayCount.toString(),
+                    label = "Unlocks",
+                    valueColor = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
     }
 }
 
 @Composable
+private fun InsightsFlatMetric(
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface,
+) {
+    Column(
+        modifier = modifier.semantics(mergeDescendants = true) {},
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = valueColor,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
 private fun UsageAccessNoticeCard(onGrantClick: () -> Unit) {
+    val tokens = LocalRebornGlassTokens.current
     GlassCard(
-        tintColor = StatusWarning.copy(alpha = 0.14f),
+        tintColor = tokens.statusWarning.copy(alpha = 0.12f),
         cornerRadius = 24.dp,
         contentPadding = PaddingValues(18.dp),
         modifier = Modifier
@@ -297,10 +328,10 @@ private fun UsageAccessNoticeCard(onGrantClick: () -> Unit) {
                 Icon(
                     imageVector = Icons.Rounded.WarningAmber,
                     contentDescription = null,
-                    tint = StatusWarning,
+                    tint = tokens.statusWarning,
                 )
                 Text(
-                    text = "Usage Access is off—screen time and top apps cannot be read yet. Blocked urges and unlock notes are still tracked locally.",
+                    text = "Usage Access is off—screen time and top apps cannot be read yet.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f),
@@ -319,93 +350,12 @@ private fun UsageAccessNoticeCard(onGrantClick: () -> Unit) {
 }
 
 @Composable
-private fun TodayMetricsRow(
-    todayScreenTimeMinutes: Int,
-    blockedTodayCount: Int,
-    unlockAttemptsTodayCount: Int,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("insights_today_metrics"),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        MetricTile(
-            icon = Icons.Rounded.Schedule,
-            tint = MaterialTheme.colorScheme.primary,
-            value = InsightsCalculator.formatDurationMinutes(todayScreenTimeMinutes),
-            label = "Screen time",
-            modifier = Modifier.weight(1f),
-        )
-        MetricTile(
-            icon = Icons.Rounded.Block,
-            tint = StatusHealthy,
-            value = blockedTodayCount.toString(),
-            label = "Blocked",
-            modifier = Modifier.weight(1f),
-        )
-        MetricTile(
-            icon = Icons.Rounded.LockOpen,
-            tint = PhoenixAmber,
-            value = unlockAttemptsTodayCount.toString(),
-            label = "Unlocks",
-            modifier = Modifier.weight(1f),
-        )
-    }
-}
-
-@Composable
-private fun MetricTile(
-    icon: ImageVector,
-    tint: Color,
-    value: String,
-    label: String,
-    modifier: Modifier = Modifier,
-) {
-    val tokens = LocalRebornGlassTokens.current
-    GlassCard(
-        cornerRadius = 22.dp,
-        contentPadding = PaddingValues(14.dp),
-        modifier = modifier.semantics(mergeDescendants = true) {},
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Box(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(tint.copy(alpha = 0.16f))
-                    .border(1.dp, tokens.borderTopLeft.copy(alpha = 0.4f), RoundedCornerShape(10.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = tint,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
-}
-
-@Composable
 private fun TopAppsTodayCard(
     topApps: List<AppScreenTimeItem>,
     usageAccessGranted: Boolean,
     loadIcon: suspend (String) -> ImageBitmap?,
 ) {
+    val tokens = LocalRebornGlassTokens.current
     GlassCard(
         cornerRadius = 26.dp,
         contentPadding = PaddingValues(18.dp),
@@ -413,7 +363,7 @@ private fun TopAppsTodayCard(
             .fillMaxWidth()
             .testTag("insights_top_apps_card"),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Text(
                 text = "Top Apps Today",
                 style = MaterialTheme.typography.titleMedium,
@@ -425,13 +375,16 @@ private fun TopAppsTodayCard(
                     text = if (usageAccessGranted) {
                         "No foreground app usage recorded yet today."
                     } else {
-                        "Grant Usage Access above to break down today's screen time by app."
+                        "Grant Usage Access above to view today's app breakdown."
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                topApps.forEach { item ->
+                topApps.forEachIndexed { idx, item ->
+                    if (idx > 0) {
+                        HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+                    }
                     TopAppRow(item = item, loadIcon = loadIcon)
                 }
             }
@@ -456,10 +409,9 @@ private fun TopAppRow(
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(tokens.cardElevatedFill)
-                .border(1.dp, tokens.borderTopLeft, RoundedCornerShape(12.dp)),
+                .size(38.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(tokens.cardSubtleFill),
             contentAlignment = Alignment.Center,
         ) {
             val bmp = icon
@@ -479,7 +431,7 @@ private fun TopAppRow(
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -497,19 +449,18 @@ private fun TopAppRow(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = InsightsCalculator.formatDurationMinutes(item.minutesToday),
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = tokens.accentText,
                 )
             }
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(7.dp)
+                    .height(6.dp)
                     .clip(RoundedCornerShape(50))
-                    .background(tokens.cardSubtleFill)
-                    .border(0.5.dp, tokens.borderBottomRight, RoundedCornerShape(50)),
+                    .background(tokens.cardSubtleFill),
             ) {
                 val fraction = item.shareFraction.coerceIn(0f, 1f)
                 if (fraction > 0f) {
@@ -518,7 +469,7 @@ private fun TopAppRow(
                             .fillMaxHeight()
                             .fillMaxWidth(fraction)
                             .clip(RoundedCornerShape(50))
-                            .background(Brush.horizontalGradient(PhoenixGradientColors)),
+                            .background(Brush.horizontalGradient(tokens.accentGradient)),
                     )
                 }
             }
@@ -539,46 +490,43 @@ private fun RecentUnlockIntentNotesCard(logs: List<UnlockPassLog>) {
             .fillMaxWidth()
             .testTag("insights_unlock_reasons_card"),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
                 text = "Recent Unlock Intentions",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            logs.take(5).forEach { log ->
+            logs.take(5).forEachIndexed { idx, log ->
+                if (idx > 0) {
+                    HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+                }
                 val whenText = Instant.ofEpochMilli(log.grantedAtEpochMs)
                     .atZone(zone)
                     .format(timeFormatter)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(tokens.cardSubtleFill)
-                        .border(1.dp, tokens.borderBottomRight, RoundedCornerShape(16.dp))
-                        .padding(12.dp),
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = "${log.appLabel} • ${log.durationMinutes}m pass",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                            Text(
-                                text = whenText,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
                         Text(
-                            text = "\"${log.reason}\"",
+                            text = "${log.appLabel} • ${log.durationMinutes}m pass",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = whenText,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
+                    Text(
+                        text = "\"${log.reason}\"",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
         }

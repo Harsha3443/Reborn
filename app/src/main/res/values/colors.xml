@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="navy_deep">#FF0A1124</color>
-    <color name="navy_surface">#FF101A34</color>
-    <color name="phoenix_orange">#FFFF6B1A</color>
-    <color name="phoenix_amber">#FFFFB830</color>
+    <color name="burgundy_bg_top">#FF0D0609</color>
+    <color name="burgundy_bg_bottom">#FF1A0A10</color>
+    <color name="burgundy_primary">#FF800020</color>
+    <color name="burgundy_light">#FFA3203A</color>
+    <color name="burgundy_dark">#FF5C0F1E</color>
+    <color name="burgundy_widget_border">#26FFFFFF</color>
+    <color name="text_ivory">#FFF5EDEF</color>
+    <color name="text_mauve_mist">#FFB9A4AA</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

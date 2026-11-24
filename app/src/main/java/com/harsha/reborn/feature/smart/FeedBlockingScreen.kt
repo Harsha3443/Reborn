@@ -3,23 +3,18 @@ package com.harsha.reborn.feature.smart
 import android.view.HapticFeedbackConstants
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Code
@@ -30,6 +25,7 @@ import androidx.compose.material.icons.rounded.SmartDisplay
 import androidx.compose.material.icons.rounded.UploadFile
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,7 +43,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
@@ -62,16 +57,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.R
 import com.harsha.reborn.ui.components.GlassButton
 import com.harsha.reborn.ui.components.GlassCard
-import com.harsha.reborn.ui.components.GlassPillBadge
 import com.harsha.reborn.ui.components.GlassPrimaryButton
 import com.harsha.reborn.ui.components.PhoenixProgressRing
 import com.harsha.reborn.ui.components.glassSwitchColors
+import com.harsha.reborn.ui.components.glassTextButtonColors
 import com.harsha.reborn.ui.components.glassTopAppBarColors
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixOrange
-import com.harsha.reborn.ui.theme.StatusHealthy
-import com.harsha.reborn.ui.theme.StatusWarning
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -153,15 +144,15 @@ fun FeedBlockingScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .widthIn(max = 600.dp),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 state.feedbackMessage?.let { message ->
                     item {
                         GlassCard(
                             cornerRadius = 20.dp,
                             elevated = true,
-                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .testTag("feed_blocking_feedback_banner"),
@@ -176,7 +167,10 @@ fun FeedBlockingScreen(
                                     style = MaterialTheme.typography.bodySmall,
                                     modifier = Modifier.weight(1f),
                                 )
-                                TextButton(onClick = viewModel::clearFeedback) {
+                                TextButton(
+                                    onClick = viewModel::clearFeedback,
+                                    colors = glassTextButtonColors(),
+                                ) {
                                     Text("OK")
                                 }
                             }
@@ -188,7 +182,7 @@ fun FeedBlockingScreen(
                     item {
                         GlassCard(
                             cornerRadius = 22.dp,
-                            tintColor = PhoenixOrange.copy(alpha = 0.14f),
+                            tintColor = tokens.accentTintFill,
                             contentPadding = PaddingValues(16.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -201,7 +195,7 @@ fun FeedBlockingScreen(
                                 Icon(
                                     imageVector = Icons.Rounded.Lock,
                                     contentDescription = null,
-                                    tint = PhoenixAmber,
+                                    tint = tokens.accentText,
                                 )
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
@@ -210,7 +204,7 @@ fun FeedBlockingScreen(
                                         fontWeight = FontWeight.SemiBold,
                                     )
                                     Text(
-                                        text = "Feed Blocking toggles and selector config are locked until Strict Mode ends.",
+                                        text = "Toggles and selector rules are locked until Strict Mode ends.",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -224,7 +218,7 @@ fun FeedBlockingScreen(
                     item {
                         GlassCard(
                             cornerRadius = 22.dp,
-                            tintColor = StatusWarning.copy(alpha = 0.14f),
+                            tintColor = tokens.statusWarning.copy(alpha = 0.12f),
                             contentPadding = PaddingValues(16.dp),
                             modifier = Modifier.fillMaxWidth(),
                         ) {
@@ -236,10 +230,10 @@ fun FeedBlockingScreen(
                                     Icon(
                                         imageVector = Icons.Rounded.WarningAmber,
                                         contentDescription = null,
-                                        tint = StatusWarning,
+                                        tint = tokens.statusWarning,
                                     )
                                     Text(
-                                        text = "Reborn App Guard (Accessibility) is off. Enable it so Reborn can back out of short-video players automatically.",
+                                        text = "Reborn App Guard (Accessibility) is off. Enable it to block short-video feeds.",
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.weight(1f),
                                     )
@@ -255,73 +249,59 @@ fun FeedBlockingScreen(
                     }
                 }
 
-                // Overview card
+                // Glass Surface #1: Overview + Per-app Toggles + DM exception
                 item {
                     GlassCard(
                         elevated = true,
-                        cornerRadius = 28.dp,
-                        contentPadding = PaddingValues(20.dp),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        ) {
-                            PhoenixProgressRing(
-                                progress = if (enabledCount == 0) 0.08f else (enabledCount.toFloat() / totalCount.toFloat()),
-                                size = 68.dp,
-                                strokeWidth = 6.dp,
-                            ) {
-                                Text(
-                                    text = "$enabledCount/$totalCount",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                verticalArrangement = Arrangement.spacedBy(6.dp),
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    Text(
-                                        text = "Short-Video Shield",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                    GlassPillBadge(
-                                        containerColor = if (enabledCount > 0) {
-                                            StatusHealthy.copy(alpha = 0.18f)
-                                        } else {
-                                            null
-                                        },
-                                    ) {
-                                        Text(
-                                            text = if (enabledCount > 0) "Active" else "Off",
-                                            style = MaterialTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = if (enabledCount > 0) StatusHealthy else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    }
-                                }
-                                Text(
-                                    text = stringResource(id = R.string.feed_blocking_subtitle),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Per-app feed toggles card
-                item {
-                    GlassCard(
                         cornerRadius = 26.dp,
                         contentPadding = PaddingValues(18.dp),
                     ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            ) {
+                                PhoenixProgressRing(
+                                    progress = if (enabledCount == 0) 0.08f else (enabledCount.toFloat() / totalCount.toFloat()),
+                                    size = 60.dp,
+                                    strokeWidth = 5.5.dp,
+                                ) {
+                                    Text(
+                                        text = "$enabledCount/$totalCount",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        Text(
+                                            text = "Short-Video Shield",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                        )
+                                        Text(
+                                            text = if (enabledCount > 0) "• Active" else "• Off",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = if (enabledCount > 0) tokens.statusHealthy else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                    Text(
+                                        text = stringResource(id = R.string.feed_blocking_subtitle),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+
+                            HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -329,7 +309,7 @@ fun FeedBlockingScreen(
                                 Icon(
                                     imageVector = Icons.Rounded.SmartDisplay,
                                     contentDescription = null,
-                                    tint = PhoenixAmber,
+                                    tint = tokens.accentText,
                                 )
                                 Text(
                                     text = "Protected Feeds by App",
@@ -338,113 +318,94 @@ fun FeedBlockingScreen(
                                 )
                             }
 
-                            state.appToggles.forEach { app ->
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(18.dp))
-                                        .background(tokens.cardSubtleFill)
-                                        .border(1.dp, tokens.borderBottomRight, RoundedCornerShape(18.dp))
-                                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                            state.appToggles.forEachIndexed { idx, app ->
+                                if (idx > 0) {
+                                    HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+                                }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(end = 12.dp),
+                                        verticalArrangement = Arrangement.spacedBy(2.dp),
                                     ) {
-                                        Column(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .padding(end = 12.dp),
-                                            verticalArrangement = Arrangement.spacedBy(2.dp),
-                                        ) {
-                                            Text(
-                                                text = app.title,
-                                                style = MaterialTheme.typography.titleSmall,
-                                                fontWeight = FontWeight.SemiBold,
-                                            )
-                                            if (app.packageName.isNotBlank()) {
-                                                Text(
-                                                    text = app.packageName,
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                )
-                                            }
-                                            Text(
-                                                text = app.description,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            )
-                                        }
-                                        Switch(
-                                            checked = app.isEnabled,
-                                            enabled = !state.isStrictLocked,
-                                            colors = glassSwitchColors(),
-                                            onCheckedChange = { checked ->
-                                                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                                                viewModel.setAppFeedEnabled(app.profileId, checked)
-                                            },
-                                            modifier = Modifier.testTag("feed_toggle_${app.profileId}"),
+                                        Text(
+                                            text = app.title,
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.SemiBold,
+                                        )
+                                        Text(
+                                            text = app.description,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                    Switch(
+                                        checked = app.isEnabled,
+                                        enabled = !state.isStrictLocked,
+                                        colors = glassSwitchColors(),
+                                        onCheckedChange = { checked ->
+                                            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                                            viewModel.setAppFeedEnabled(app.profileId, checked)
+                                        },
+                                        modifier = Modifier.testTag("feed_toggle_${app.profileId}"),
+                                    )
+                                }
+                            }
+
+                            HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(end = 12.dp),
+                                    verticalAlignment = Alignment.Top,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Forum,
+                                        contentDescription = null,
+                                        tint = tokens.accentText,
+                                        modifier = Modifier.padding(top = 2.dp),
+                                    )
+                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        Text(
+                                            text = stringResource(id = R.string.feed_allow_dms_title),
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.SemiBold,
+                                        )
+                                        Text(
+                                            text = stringResource(id = R.string.feed_allow_dms_subtitle),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
                                 }
-                            }
-                        }
-                    }
-                }
-
-                // Allow Reels from DMs card
-                item {
-                    GlassCard(
-                        cornerRadius = 26.dp,
-                        contentPadding = PaddingValues(18.dp),
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(end = 12.dp),
-                                verticalAlignment = Alignment.Top,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Forum,
-                                    contentDescription = null,
-                                    tint = PhoenixAmber,
-                                    modifier = Modifier.padding(top = 2.dp),
+                                Switch(
+                                    checked = state.allowReelsFromDms,
+                                    enabled = !state.isStrictLocked,
+                                    colors = glassSwitchColors(),
+                                    onCheckedChange = { checked ->
+                                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                                        viewModel.setAllowReelsFromDms(checked)
+                                    },
+                                    modifier = Modifier.testTag("feed_allow_dms_switch"),
                                 )
-                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    Text(
-                                        text = stringResource(id = R.string.feed_allow_dms_title),
-                                        style = MaterialTheme.typography.titleSmall,
-                                        fontWeight = FontWeight.SemiBold,
-                                    )
-                                    Text(
-                                        text = stringResource(id = R.string.feed_allow_dms_subtitle),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
                             }
-                            Switch(
-                                checked = state.allowReelsFromDms,
-                                enabled = !state.isStrictLocked,
-                                colors = glassSwitchColors(),
-                                onCheckedChange = { checked ->
-                                    view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                                    viewModel.setAllowReelsFromDms(checked)
-                                },
-                                modifier = Modifier.testTag("feed_allow_dms_switch"),
-                            )
                         }
                     }
                 }
 
-                // Config-driven Selector JSON asset & file import card
+                // Glass Surface #2: Selector JSON config
                 item {
                     GlassCard(
                         cornerRadius = 26.dp,
@@ -458,7 +419,7 @@ fun FeedBlockingScreen(
                                 Icon(
                                     imageVector = Icons.Rounded.Code,
                                     contentDescription = null,
-                                    tint = PhoenixAmber,
+                                    tint = tokens.accentText,
                                 )
                                 Text(
                                     text = "Selector Rules Config",
@@ -469,9 +430,9 @@ fun FeedBlockingScreen(
 
                             Text(
                                 text = if (state.usingCustomJson) {
-                                    "Using custom imported JSON (${state.activeCatalog.profiles.size} profiles, schema v${state.activeCatalog.schemaVersion})."
+                                    "Using custom imported JSON (${state.activeCatalog.profiles.size} profiles, v${state.activeCatalog.schemaVersion})."
                                 } else {
-                                    "Using built-in feed_selectors.json asset (${state.activeCatalog.profiles.size} profiles, schema v${state.activeCatalog.schemaVersion})."
+                                    "Using built-in feed_selectors.json asset (${state.activeCatalog.profiles.size} profiles, v${state.activeCatalog.schemaVersion})."
                                 },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -495,45 +456,40 @@ fun FeedBlockingScreen(
                                 Text(stringResource(id = R.string.feed_import_json_button))
                             }
 
-                            GlassButton(
-                                onClick = { showJsonDialog = true },
-                                enabled = !state.isStrictLocked,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag("feed_view_json_button"),
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Code,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp),
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(id = R.string.feed_view_json_button))
-                            }
-
-                            if (state.usingCustomJson) {
                                 GlassButton(
-                                    onClick = viewModel::resetToDefaultJson,
+                                    onClick = { showJsonDialog = true },
                                     enabled = !state.isStrictLocked,
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .testTag("feed_reset_json_button"),
+                                        .weight(1f)
+                                        .testTag("feed_view_json_button"),
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Restore,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp),
-                                    )
+                                    Text(stringResource(id = R.string.feed_view_json_button))
+                                }
+                                if (state.usingCustomJson) {
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(stringResource(id = R.string.feed_reset_json_button))
+                                    GlassButton(
+                                        onClick = viewModel::resetToDefaultJson,
+                                        enabled = !state.isStrictLocked,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .testTag("feed_reset_json_button"),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Restore,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp),
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text("Reset")
+                                    }
                                 }
                             }
                         }
                     }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }

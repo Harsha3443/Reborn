@@ -44,6 +44,7 @@ import com.harsha.reborn.ui.components.GlassPrimaryButton
 import com.harsha.reborn.ui.components.glassFilterChipBorder
 import com.harsha.reborn.ui.components.glassFilterChipColors
 import com.harsha.reborn.ui.components.glassOutlinedTextFieldColors
+import com.harsha.reborn.ui.components.glassTextButtonColors
 import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -138,6 +139,7 @@ fun ConditionalRuleEditorDialog(
 
                 TextButton(
                     onClick = { showAppPicker = true },
+                    colors = glassTextButtonColors(),
                     modifier = Modifier.testTag("conditional_pick_apps_button"),
                 ) {
                     Text("Target Apps (${packages.size} chosen)")
@@ -164,7 +166,10 @@ fun ConditionalRuleEditorDialog(
                     )
                     val activeSsid = currentWifiSsid ?: onSampleWifiSsid()
                     if (!activeSsid.isNullOrBlank()) {
-                        TextButton(onClick = { wifiSsid = activeSsid }) {
+                        TextButton(
+                            onClick = { wifiSsid = activeSsid },
+                            colors = glassTextButtonColors(),
+                        ) {
                             Text("Use current Wi-Fi ($activeSsid)")
                         }
                     }
@@ -306,7 +311,7 @@ fun ConditionalRuleEditorDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss, colors = glassTextButtonColors()) { Text("Cancel") }
         },
     )
 }
@@ -324,8 +329,14 @@ private fun ConditionalTimeRow(
     ) {
         Text("$label: ${RuleEvaluator.formatMinute(minuteOfDay)}", style = MaterialTheme.typography.bodyMedium)
         Row {
-            TextButton(onClick = { onChange((minuteOfDay - 30 + 1440) % 1440) }) { Text("-30m") }
-            TextButton(onClick = { onChange((minuteOfDay + 30) % 1440) }) { Text("+30m") }
+            TextButton(
+                onClick = { onChange((minuteOfDay - 30 + 1440) % 1440) },
+                colors = glassTextButtonColors(),
+            ) { Text("-30m") }
+            TextButton(
+                onClick = { onChange((minuteOfDay + 30) % 1440) },
+                colors = glassTextButtonColors(),
+            ) { Text("+30m") }
         }
     }
 }
@@ -363,6 +374,7 @@ fun FeedSelectorsConfigDialog(
                 )
                 TextButton(
                     onClick = { jsonText = FeedSelectorRegistry.DEFAULT_SELECTOR_JSON },
+                    colors = glassTextButtonColors(),
                     modifier = Modifier.testTag("feed_selector_reset_button"),
                 ) {
                     Text("Reset to Built-in Defaults")
@@ -386,7 +398,7 @@ fun FeedSelectorsConfigDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss, colors = glassTextButtonColors()) { Text("Cancel") }
         },
     )
 }

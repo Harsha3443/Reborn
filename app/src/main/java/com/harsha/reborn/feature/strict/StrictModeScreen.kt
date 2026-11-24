@@ -18,13 +18,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,10 +53,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.harsha.reborn.ui.components.GlassCard
 import com.harsha.reborn.ui.components.GlassPrimaryButton
+import com.harsha.reborn.ui.components.glassTextButtonColors
 import com.harsha.reborn.ui.components.glassTopAppBarColors
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.StatusCritical
-import com.harsha.reborn.ui.theme.StatusHealthy
+import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +67,7 @@ fun StrictModeScreen(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val view = LocalView.current
+    val tokens = LocalRebornGlassTokens.current
     val isLocked = state.config.isEffectivelyLocked(state.nowEpochMs)
 
     val adminLauncher = rememberLauncherForActivityResult(
@@ -169,15 +169,15 @@ fun StrictModeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .widthIn(max = 600.dp),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 if (state.feedbackError != null || state.feedbackMessage != null) {
                     item {
                         val isErr = state.feedbackError != null
                         GlassCard(
                             cornerRadius = 20.dp,
-                            tintColor = if (isErr) StatusCritical.copy(alpha = 0.16f) else StatusHealthy.copy(alpha = 0.14f),
+                            tintColor = if (isErr) tokens.statusCritical.copy(alpha = 0.14f) else tokens.statusHealthy.copy(alpha = 0.12f),
                             contentPadding = PaddingValues(14.dp),
                             modifier = Modifier.fillMaxWidth(),
                         ) {
@@ -189,10 +189,13 @@ fun StrictModeScreen(
                                 Text(
                                     text = state.feedbackError ?: state.feedbackMessage.orEmpty(),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = if (isErr) StatusCritical else MaterialTheme.colorScheme.onSurface,
+                                    color = if (isErr) tokens.statusCritical else MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.weight(1f),
                                 )
-                                TextButton(onClick = viewModel::clearFeedback) { Text("OK") }
+                                TextButton(
+                                    onClick = viewModel::clearFeedback,
+                                    colors = glassTextButtonColors(),
+                                ) { Text("OK") }
                             }
                         }
                     }
@@ -246,14 +249,9 @@ fun StrictModeScreen(
                     }
                 } else {
                     item {
-                        StrictSetupDurationCard(
+                        StrictSetupCard(
                             durationMinutes = durationMinutes,
                             onDurationChange = { durationMinutes = it },
-                        )
-                    }
-
-                    item {
-                        StrictSetupSafeguardsCard(
                             requirePin = requirePin,
                             onRequirePinChange = { requirePin = it },
                             pinInput = pinInput,
@@ -265,18 +263,13 @@ fun StrictModeScreen(
                             onRequireTrustedCodeChange = { requireTrustedCode = it },
                             generatedTrustedCode = state.generatedTrustedCode,
                             onRegenerateTrustedCode = viewModel::regenerateTrustedCode,
-                            context = context,
-                        )
-                    }
-
-                    item {
-                        StrictSetupProtectionsCard(
                             blockSystemGuards = blockSystemGuards,
                             onBlockSystemGuardsChange = { blockSystemGuards = it },
                             disallowUnlockPasses = disallowUnlockPasses,
                             onDisallowUnlockPassesChange = { disallowUnlockPasses = it },
                             emergencyWaitMinutes = emergencyWaitMinutes,
                             onEmergencyWaitChange = { emergencyWaitMinutes = it },
+                            context = context,
                         )
                     }
 
@@ -323,55 +316,63 @@ fun StrictModeScreen(
                     }
                 }
 
+                // Device Admin + Strict Mode Log grouped in Glass Surface #2
                 item {
-                    DeviceAdminCard(
-                        isDeviceAdminActive = state.isDeviceAdminActive,
-                        isLocked = isLocked,
-                        onEnableDeviceAdmin = { adminLauncher.launch(viewModel.getActivateDeviceAdminIntent()) },
-                        onDisableDeviceAdmin = viewModel::deactivateDeviceAdmin,
-                    )
-                }
-
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
+                    GlassCard(
+                        cornerRadius = 26.dp,
+                        contentPadding = PaddingValues(18.dp),
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Icon(Icons.Rounded.History, contentDescription = null, tint = PhoenixAmber)
-                            Text("Strict Mode Log", style = MaterialTheme.typography.titleMedium)
-                        }
-                        if (state.logs.isNotEmpty() && !isLocked) {
-                            TextButton(onClick = viewModel::clearLogs) {
-                                Icon(Icons.Rounded.DeleteSweep, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Clear")
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            DeviceAdminSection(
+                                isDeviceAdminActive = state.isDeviceAdminActive,
+                                isLocked = isLocked,
+                                onEnableDeviceAdmin = { adminLauncher.launch(viewModel.getActivateDeviceAdminIntent()) },
+                                onDisableDeviceAdmin = viewModel::deactivateDeviceAdmin,
+                            )
+
+                            HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                ) {
+                                    Icon(Icons.Rounded.History, contentDescription = null, tint = tokens.accentText)
+                                    Text("Strict Mode Log", style = MaterialTheme.typography.titleMedium)
+                                }
+                                if (state.logs.isNotEmpty() && !isLocked) {
+                                    TextButton(
+                                        onClick = viewModel::clearLogs,
+                                        colors = glassTextButtonColors(),
+                                    ) {
+                                        Icon(Icons.Rounded.DeleteSweep, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Clear")
+                                    }
+                                }
+                            }
+
+                            if (state.logs.isEmpty()) {
+                                Text(
+                                    text = "Locks, early unlocks, and emergency escapes are logged locally here.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            } else {
+                                state.logs.forEachIndexed { idx, log ->
+                                    if (idx > 0) {
+                                        HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+                                    }
+                                    StrictLogEntryRow(log = log)
+                                }
                             }
                         }
                     }
                 }
-
-                if (state.logs.isEmpty()) {
-                    item {
-                        GlassCard(cornerRadius = 22.dp, contentPadding = PaddingValues(16.dp)) {
-                            Text(
-                                text = "Strict Mode locks, early unlocks, and emergency escapes are logged locally here.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                } else {
-                    items(state.logs, key = { "strict_log_${it.id}" }) { log ->
-                        StrictLogEntryCard(log = log)
-                    }
-                }
-
-                item { Spacer(modifier = Modifier.height(12.dp)) }
             }
         }
     }

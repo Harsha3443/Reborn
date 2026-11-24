@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -36,12 +35,12 @@ import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -61,19 +60,15 @@ import com.harsha.reborn.core.data.model.StrictModeLogEntry
 import com.harsha.reborn.ui.components.GlassAlertDialog
 import com.harsha.reborn.ui.components.GlassButton
 import com.harsha.reborn.ui.components.GlassCard
-import com.harsha.reborn.ui.components.GlassPillBadge
 import com.harsha.reborn.ui.components.GlassPrimaryButton
 import com.harsha.reborn.ui.components.PhoenixProgressRing
 import com.harsha.reborn.ui.components.glassFilterChipBorder
 import com.harsha.reborn.ui.components.glassFilterChipColors
 import com.harsha.reborn.ui.components.glassOutlinedTextFieldColors
+import com.harsha.reborn.ui.components.glassSliderColors
 import com.harsha.reborn.ui.components.glassSwitchColors
+import com.harsha.reborn.ui.components.glassTextButtonColors
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixOrange
-import com.harsha.reborn.ui.theme.StatusCritical
-import com.harsha.reborn.ui.theme.StatusHealthy
-import com.harsha.reborn.ui.theme.StatusWarning
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -86,11 +81,12 @@ internal fun TrustedCodeConfirmDialog(
     onDismiss: () -> Unit,
     onConfirmLock: () -> Unit,
 ) {
+    val tokens = LocalRebornGlassTokens.current
     GlassAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Share Trusted-Contact Code First") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
                     text = "Once Strict Mode locks, Reborn hides this code so only your friend has it.",
                     style = MaterialTheme.typography.bodySmall,
@@ -99,9 +95,8 @@ internal fun TrustedCodeConfirmDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(PhoenixOrange.copy(alpha = 0.16f))
-                        .border(1.dp, PhoenixAmber.copy(alpha = 0.4f), RoundedCornerShape(18.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(tokens.accentTintFill)
                         .padding(14.dp),
                     horizontalArrangement = Arrangement.Center,
                 ) {
@@ -109,7 +104,7 @@ internal fun TrustedCodeConfirmDialog(
                         text = code,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = PhoenixAmber,
+                        color = tokens.accentText,
                     )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -141,7 +136,10 @@ internal fun TrustedCodeConfirmDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                colors = glassTextButtonColors(),
+            ) {
                 Text("Cancel")
             }
         },
@@ -153,6 +151,7 @@ internal fun StrictLockedOverviewCard(
     config: StrictModeConfig,
     nowEpochMs: Long,
 ) {
+    val tokens = LocalRebornGlassTokens.current
     val remSec = ((config.endsAtEpochMs - nowEpochMs) / 1000L).coerceAtLeast(0L)
     val hrs = remSec / 3600L
     val mins = (remSec % 3600L) / 60L
@@ -161,19 +160,19 @@ internal fun StrictLockedOverviewCard(
         .format(Date(config.endsAtEpochMs))
 
     GlassCard(
-        cornerRadius = 30.dp,
+        cornerRadius = 28.dp,
         elevated = true,
-        tintColor = PhoenixOrange.copy(alpha = 0.14f),
+        tintColor = tokens.accentTintFill,
         contentPadding = PaddingValues(20.dp),
         modifier = Modifier.testTag("strict_active_card"),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 PhoenixProgressRing(
                     progress = (remSec.toFloat() / 7200f).coerceIn(0.12f, 1f),
@@ -183,7 +182,7 @@ internal fun StrictLockedOverviewCard(
                     Icon(
                         imageVector = Icons.Rounded.Lock,
                         contentDescription = null,
-                        tint = PhoenixAmber,
+                        tint = tokens.accentText,
                         modifier = Modifier.size(26.dp),
                     )
                 }
@@ -192,7 +191,7 @@ internal fun StrictLockedOverviewCard(
                         text = "Strict Mode Locked",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = PhoenixAmber,
+                        color = tokens.accentText,
                     )
                     Text(
                         text = String.format(Locale.US, "%02d:%02d:%02d", hrs, mins, secs),
@@ -220,13 +219,14 @@ internal fun StrictEarlyUnlockCard(
     onUnlockCodeChange: (String) -> Unit,
     onAttemptEarlyUnlock: () -> Unit,
 ) {
-    GlassCard(cornerRadius = 26.dp) {
+    val tokens = LocalRebornGlassTokens.current
+    GlassCard(cornerRadius = 26.dp, contentPadding = PaddingValues(18.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Icon(Icons.Rounded.LockOpen, contentDescription = null, tint = PhoenixAmber)
+                Icon(Icons.Rounded.LockOpen, contentDescription = null, tint = tokens.accentText)
                 Text(
                     text = "Unlock Early",
                     style = MaterialTheme.typography.titleMedium,
@@ -242,11 +242,11 @@ internal fun StrictEarlyUnlockCard(
                     Icon(
                         imageVector = Icons.Rounded.BatteryChargingFull,
                         contentDescription = null,
-                        tint = if (isChargerConnected) StatusHealthy else StatusWarning,
+                        tint = if (isChargerConnected) tokens.statusHealthy else tokens.statusWarning,
                     )
                     Text(
                         text = if (isChargerConnected) {
-                            "Charger connected ✓"
+                            "Charger connected"
                         } else {
                             "Plug in a charger to satisfy unlock condition"
                         },
@@ -304,16 +304,18 @@ internal fun StrictEmergencySectionCard(
     waitMinutes: Int,
     onStartEmergencyEscape: () -> Unit,
 ) {
+    val tokens = LocalRebornGlassTokens.current
     GlassCard(
         cornerRadius = 26.dp,
-        tintColor = StatusCritical.copy(alpha = 0.08f),
+        tintColor = tokens.statusCritical.copy(alpha = 0.08f),
+        contentPadding = PaddingValues(18.dp),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Icon(Icons.Rounded.WarningAmber, contentDescription = null, tint = StatusWarning)
+                Icon(Icons.Rounded.WarningAmber, contentDescription = null, tint = tokens.statusWarning)
                 Text(
                     text = "Emergency Escape Hatch",
                     style = MaterialTheme.typography.titleMedium,
@@ -321,13 +323,13 @@ internal fun StrictEmergencySectionCard(
                 )
             }
             Text(
-                text = "Requires a ${waitMinutes}-minute uninterrupted cool-down and typing an affirmation phrase. Recorded in the log.",
+                text = "Requires a ${waitMinutes}-minute wait and typing an affirmation phrase.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             GlassButton(
                 onClick = onStartEmergencyEscape,
-                contentColor = StatusCritical,
+                contentColor = tokens.statusCritical,
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("strict_emergency_escape_button"),
@@ -340,61 +342,9 @@ internal fun StrictEmergencySectionCard(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun StrictSetupDurationCard(
+internal fun StrictSetupCard(
     durationMinutes: Int,
     onDurationChange: (Int) -> Unit,
-) {
-    GlassCard(cornerRadius = 26.dp) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Icon(Icons.Rounded.Shield, contentDescription = null, tint = PhoenixOrange)
-                Text(
-                    text = "Lock Duration",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-            Text(
-                text = "Duration: ${formatDurationMinutes(durationMinutes)}",
-                style = MaterialTheme.typography.titleSmall,
-                color = PhoenixAmber,
-            )
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                listOf(30, 60, 120, 240, 480, 1440).forEach { preset ->
-                    val selected = durationMinutes == preset
-                    FilterChip(
-                        selected = selected,
-                        onClick = { onDurationChange(preset) },
-                        colors = glassFilterChipColors(),
-                        border = glassFilterChipBorder(selected),
-                        label = { Text(formatDurationMinutes(preset)) },
-                        modifier = Modifier
-                            .heightIn(min = 48.dp)
-                            .testTag("strict_duration_$preset"),
-                    )
-                }
-            }
-            Slider(
-                value = durationMinutes.toFloat(),
-                onValueChange = { onDurationChange((it / 15f).roundToInt().coerceAtLeast(1) * 15) },
-                valueRange = 15f..1440f,
-                colors = SliderDefaults.colors(
-                    thumbColor = PhoenixAmber,
-                    activeTrackColor = PhoenixOrange,
-                ),
-            )
-        }
-    }
-}
-
-@Composable
-internal fun StrictSetupSafeguardsCard(
     requirePin: Boolean,
     onRequirePinChange: (Boolean) -> Unit,
     pinInput: String,
@@ -406,118 +356,259 @@ internal fun StrictSetupSafeguardsCard(
     onRequireTrustedCodeChange: (Boolean) -> Unit,
     generatedTrustedCode: String,
     onRegenerateTrustedCode: () -> Unit,
+    blockSystemGuards: Boolean,
+    onBlockSystemGuardsChange: (Boolean) -> Unit,
+    disallowUnlockPasses: Boolean,
+    onDisallowUnlockPassesChange: (Boolean) -> Unit,
+    emergencyWaitMinutes: Int,
+    onEmergencyWaitChange: (Int) -> Unit,
     context: Context,
 ) {
     val tokens = LocalRebornGlassTokens.current
-    GlassCard(cornerRadius = 26.dp) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(
-                text = "Optional Early Unlock Safeguards",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = "Leave all unchecked for a pure duration lock.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+    val view = LocalView.current
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Checkbox(
-                    checked = requirePin,
-                    onCheckedChange = onRequirePinChange,
-                    modifier = Modifier.testTag("strict_require_pin_checkbox"),
-                )
-                Icon(Icons.Rounded.Pin, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Require PIN", style = MaterialTheme.typography.bodyMedium)
-            }
-
-            if (requirePin) {
-                OutlinedTextField(
-                    value = pinInput,
-                    onValueChange = { if (it.length <= 8 && it.all(Char::isDigit)) onPinInputChange(it) },
-                    label = { Text("4-8 digit PIN") },
-                    singleLine = true,
-                    shape = RoundedCornerShape(18.dp),
-                    colors = glassOutlinedTextFieldColors(),
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("strict_setup_pin_input"),
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Checkbox(
-                    checked = requireCharger,
-                    onCheckedChange = onRequireChargerChange,
-                    modifier = Modifier.testTag("strict_require_charger_checkbox"),
-                )
-                Icon(Icons.Rounded.BatteryChargingFull, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    Text("Require Charger Connected", style = MaterialTheme.typography.bodyMedium)
-                    Text(
-                        text = if (isChargerConnected) "Currently plugged in" else "Currently unplugged",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Checkbox(
-                    checked = requireTrustedCode,
-                    onCheckedChange = onRequireTrustedCodeChange,
-                    modifier = Modifier.testTag("strict_require_trusted_checkbox"),
-                )
-                Icon(Icons.Rounded.People, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    Text("Require Trusted-Contact Code", style = MaterialTheme.typography.bodyMedium)
-                    Text(
-                        text = "Offline code to send a friend before locking",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-
-            if (requireTrustedCode) {
+    GlassCard(
+        cornerRadius = 26.dp,
+        contentPadding = PaddingValues(18.dp),
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            // 1. Duration
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(tokens.cardElevatedFill)
-                        .border(1.dp, tokens.borderTopLeft, RoundedCornerShape(18.dp))
-                        .padding(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Icon(Icons.Rounded.Shield, contentDescription = null, tint = tokens.accentText)
+                        Text(
+                            text = "Lock Duration",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
                     Text(
-                        text = generatedTrustedCode,
+                        text = formatDurationMinutes(durationMinutes),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = PhoenixAmber,
+                        color = tokens.accentText,
                     )
+                }
+
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    listOf(30, 60, 120, 240, 480, 1440).forEach { preset ->
+                        val selected = durationMinutes == preset
+                        FilterChip(
+                            selected = selected,
+                            onClick = { onDurationChange(preset) },
+                            colors = glassFilterChipColors(),
+                            border = glassFilterChipBorder(selected),
+                            label = { Text(formatDurationMinutes(preset)) },
+                            modifier = Modifier
+                                .heightIn(min = 48.dp)
+                                .testTag("strict_duration_$preset"),
+                        )
+                    }
+                }
+                Slider(
+                    value = durationMinutes.toFloat(),
+                    onValueChange = { onDurationChange((it / 15f).roundToInt().coerceAtLeast(1) * 15) },
+                    valueRange = 15f..1440f,
+                    colors = glassSliderColors(),
+                )
+            }
+
+            HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+
+            // 2. Early Unlock Safeguards
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Early Unlock Safeguards",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = "Leave unchecked for a pure duration lock.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = requirePin,
+                        onCheckedChange = onRequirePinChange,
+                        modifier = Modifier.testTag("strict_require_pin_checkbox"),
+                    )
+                    Icon(Icons.Rounded.Pin, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Require PIN", style = MaterialTheme.typography.bodyMedium)
+                }
+
+                if (requirePin) {
+                    OutlinedTextField(
+                        value = pinInput,
+                        onValueChange = { if (it.length <= 8 && it.all(Char::isDigit)) onPinInputChange(it) },
+                        label = { Text("4-8 digit PIN") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(18.dp),
+                        colors = glassOutlinedTextFieldColors(),
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("strict_setup_pin_input"),
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = requireCharger,
+                        onCheckedChange = onRequireChargerChange,
+                        modifier = Modifier.testTag("strict_require_charger_checkbox"),
+                    )
+                    Icon(Icons.Rounded.BatteryChargingFull, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text("Require Charger Connected", style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = if (isChargerConnected) "Currently plugged in" else "Currently unplugged",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = requireTrustedCode,
+                        onCheckedChange = onRequireTrustedCodeChange,
+                        modifier = Modifier.testTag("strict_require_trusted_checkbox"),
+                    )
+                    Icon(Icons.Rounded.People, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text("Require Trusted-Contact Code", style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = "Offline code to share before locking",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
+                if (requireTrustedCode) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(tokens.cardSubtleFill)
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = generatedTrustedCode,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = tokens.accentText,
+                        )
+                        Row {
+                            IconButton(onClick = onRegenerateTrustedCode) {
+                                Icon(Icons.Rounded.Refresh, contentDescription = "Regenerate code")
+                            }
+                            IconButton(onClick = { copyText(context, generatedTrustedCode) }) {
+                                Icon(Icons.Rounded.ContentCopy, contentDescription = "Copy code")
+                            }
+                        }
+                    }
+                }
+            }
+
+            HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+
+            // 3. Tamper & Settings Protections
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "Tamper & Settings Protections",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Lock Settings & System Guards", style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = "Blocks Reborn settings and system Accessibility/Uninstall screens.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Switch(
+                        checked = blockSystemGuards,
+                        colors = glassSwitchColors(),
+                        onCheckedChange = {
+                            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                            onBlockSystemGuardsChange(it)
+                        },
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Disable Intent Unlock Passes", style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = "Prevents temporary 5/10/15m passes while locked.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Switch(
+                        checked = disallowUnlockPasses,
+                        colors = glassSwitchColors(),
+                        onCheckedChange = {
+                            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                            onDisallowUnlockPassesChange(it)
+                        },
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("Emergency wait: ${emergencyWaitMinutes}m", style = MaterialTheme.typography.bodyMedium)
                     Row {
-                        IconButton(onClick = onRegenerateTrustedCode) {
-                            Icon(Icons.Rounded.Refresh, contentDescription = "Regenerate code")
-                        }
-                        IconButton(onClick = { copyText(context, generatedTrustedCode) }) {
-                            Icon(Icons.Rounded.ContentCopy, contentDescription = "Copy code")
-                        }
+                        TextButton(
+                            onClick = { if (emergencyWaitMinutes > 1) onEmergencyWaitChange(emergencyWaitMinutes - 1) },
+                            enabled = emergencyWaitMinutes > 1,
+                            colors = glassTextButtonColors(),
+                        ) { Text("-1m") }
+                        TextButton(
+                            onClick = { if (emergencyWaitMinutes < 30) onEmergencyWaitChange(emergencyWaitMinutes + 1) },
+                            enabled = emergencyWaitMinutes < 30,
+                            colors = glassTextButtonColors(),
+                        ) { Text("+1m") }
                     }
                 }
             }
@@ -526,176 +617,96 @@ internal fun StrictSetupSafeguardsCard(
 }
 
 @Composable
-internal fun StrictSetupProtectionsCard(
-    blockSystemGuards: Boolean,
-    onBlockSystemGuardsChange: (Boolean) -> Unit,
-    disallowUnlockPasses: Boolean,
-    onDisallowUnlockPassesChange: (Boolean) -> Unit,
-    emergencyWaitMinutes: Int,
-    onEmergencyWaitChange: (Int) -> Unit,
-) {
-    val view = LocalView.current
-    GlassCard(cornerRadius = 26.dp) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(
-                text = "Tamper & Settings Protections",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Lock Settings & System Guards", style = MaterialTheme.typography.bodyMedium)
-                    Text(
-                        text = "Blocks Reborn rules/friction edits plus Accessibility, Force Stop, Device Admin & Uninstall screens.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Switch(
-                    checked = blockSystemGuards,
-                    colors = glassSwitchColors(),
-                    onCheckedChange = {
-                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                        onBlockSystemGuardsChange(it)
-                    },
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Disable Intent Unlock Passes", style = MaterialTheme.typography.bodyMedium)
-                    Text(
-                        text = "Prevents temporary 5/10/15m passes while Strict Mode is locked.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Switch(
-                    checked = disallowUnlockPasses,
-                    colors = glassSwitchColors(),
-                    onCheckedChange = {
-                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                        onDisallowUnlockPassesChange(it)
-                    },
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Emergency wait: ${emergencyWaitMinutes}m", style = MaterialTheme.typography.bodyMedium)
-                Row {
-                    TextButton(
-                        onClick = { if (emergencyWaitMinutes > 1) onEmergencyWaitChange(emergencyWaitMinutes - 1) },
-                        enabled = emergencyWaitMinutes > 1,
-                    ) { Text("-1m") }
-                    TextButton(
-                        onClick = { if (emergencyWaitMinutes < 30) onEmergencyWaitChange(emergencyWaitMinutes + 1) },
-                        enabled = emergencyWaitMinutes < 30,
-                    ) { Text("+1m") }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-internal fun DeviceAdminCard(
+internal fun DeviceAdminSection(
     isDeviceAdminActive: Boolean,
     isLocked: Boolean,
     onEnableDeviceAdmin: () -> Unit,
     onDisableDeviceAdmin: () -> Unit,
 ) {
-    GlassCard(cornerRadius = 26.dp) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Icon(
-                    imageVector = if (isDeviceAdminActive) Icons.Rounded.CheckCircle else Icons.Rounded.AdminPanelSettings,
-                    contentDescription = null,
-                    tint = if (isDeviceAdminActive) StatusHealthy else PhoenixAmber,
-                )
-                Text(
-                    text = "Device Admin Uninstall Protection",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-            Text(
-                text = if (isDeviceAdminActive) {
-                    "Active: Android prevents direct uninstallation of Reborn while Device Admin is enabled."
-                } else {
-                    "Optional safeguard: enable Device Admin to prevent impulsive uninstallation of Reborn."
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+    val tokens = LocalRebornGlassTokens.current
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(
+                imageVector = if (isDeviceAdminActive) Icons.Rounded.CheckCircle else Icons.Rounded.AdminPanelSettings,
+                contentDescription = null,
+                tint = if (isDeviceAdminActive) tokens.statusHealthy else tokens.accentText,
             )
-            if (!isDeviceAdminActive) {
-                GlassButton(
-                    onClick = onEnableDeviceAdmin,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("enable_device_admin_button"),
-                ) {
-                    Text("Enable Device Admin Guard")
-                }
-            } else if (!isLocked) {
-                GlassButton(
-                    onClick = onDisableDeviceAdmin,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("disable_device_admin_button"),
-                ) {
-                    Text("Turn Off Device Admin")
-                }
+            Text(
+                text = "Device Admin Uninstall Protection",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+        Text(
+            text = if (isDeviceAdminActive) {
+                "Active: Android prevents direct uninstallation while Device Admin is enabled."
+            } else {
+                "Optional safeguard to prevent impulsive uninstallation of Reborn."
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (!isDeviceAdminActive) {
+            GlassButton(
+                onClick = onEnableDeviceAdmin,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("enable_device_admin_button"),
+            ) {
+                Text("Enable Device Admin Guard")
+            }
+        } else if (!isLocked) {
+            GlassButton(
+                onClick = onDisableDeviceAdmin,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("disable_device_admin_button"),
+            ) {
+                Text("Turn Off Device Admin")
             }
         }
     }
 }
 
 @Composable
-internal fun StrictLogEntryCard(log: StrictModeLogEntry) {
+internal fun StrictLogEntryRow(log: StrictModeLogEntry) {
+    val tokens = LocalRebornGlassTokens.current
     val dateText = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
         .format(Date(log.timestampEpochMs))
-    val badgeColor = when (log.eventType) {
-        StrictEventType.EMERGENCY_ESCAPE -> StatusCritical.copy(alpha = 0.22f)
-        StrictEventType.TIMER_ENDED -> StatusHealthy.copy(alpha = 0.20f)
-        else -> null
+    val titleColor = when (log.eventType) {
+        StrictEventType.EMERGENCY_ESCAPE -> tokens.statusCritical
+        StrictEventType.TIMER_ENDED -> tokens.statusHealthy
+        else -> tokens.accentText
     }
-    GlassCard(cornerRadius = 22.dp, contentPadding = PaddingValues(14.dp)) {
-        Column(
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                GlassPillBadge(containerColor = badgeColor) {
-                    Text(
-                        text = log.eventType.name.replace("_", " "),
-                        style = MaterialTheme.typography.labelSmall,
-                    )
-                }
-                Text(
-                    text = dateText,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Text(log.detail, style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = log.eventType.name.replace("_", " "),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = titleColor,
+            )
+            Text(
+                text = dateText,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
+        Text(
+            text = log.detail,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,8 +43,9 @@ import com.harsha.reborn.ui.components.GlassPrimaryButton
 import com.harsha.reborn.ui.components.glassFilterChipBorder
 import com.harsha.reborn.ui.components.glassFilterChipColors
 import com.harsha.reborn.ui.components.glassOutlinedTextFieldColors
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixOrange
+import com.harsha.reborn.ui.components.glassSliderColors
+import com.harsha.reborn.ui.components.glassTextButtonColors
+import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
 import kotlin.math.roundToInt
 
 private val DAY_LABELS = listOf(
@@ -127,7 +127,7 @@ fun MultiAppSelectorDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss, colors = glassTextButtonColors()) { Text("Cancel") }
         },
     )
 }
@@ -151,6 +151,7 @@ fun ScheduleEditorDialog(
         )
     }
     var showAppPicker by remember { mutableStateOf(false) }
+    val tokens = LocalRebornGlassTokens.current
 
     if (showAppPicker) {
         MultiAppSelectorDialog(
@@ -215,12 +216,13 @@ fun ScheduleEditorDialog(
                     Text(
                         text = "Overnight schedule (crosses midnight into the next morning).",
                         style = MaterialTheme.typography.bodySmall,
-                        color = PhoenixAmber,
+                        color = tokens.accentText,
                     )
                 }
 
                 TextButton(
                     onClick = { showAppPicker = true },
+                    colors = glassTextButtonColors(),
                     modifier = Modifier.testTag("schedule_pick_apps_button"),
                 ) {
                     Text("Select Apps (${packages.size} chosen)")
@@ -250,7 +252,7 @@ fun ScheduleEditorDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss, colors = glassTextButtonColors()) { Text("Cancel") }
         },
     )
 }
@@ -272,8 +274,14 @@ private fun TimeStepperRow(
             fontWeight = FontWeight.Medium,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            TextButton(onClick = { onChange((minuteOfDay - 30 + 1440) % 1440) }) { Text("-30m") }
-            TextButton(onClick = { onChange((minuteOfDay + 30) % 1440) }) { Text("+30m") }
+            TextButton(
+                onClick = { onChange((minuteOfDay - 30 + 1440) % 1440) },
+                colors = glassTextButtonColors(),
+            ) { Text("-30m") }
+            TextButton(
+                onClick = { onChange((minuteOfDay + 30) % 1440) },
+                colors = glassTextButtonColors(),
+            ) { Text("+30m") }
         }
     }
 }
@@ -293,6 +301,7 @@ fun DailyLimitEditorDialog(
     }
     var packages by remember { mutableStateOf(defaultPackages) }
     var showAppPicker by remember { mutableStateOf(false) }
+    val tokens = LocalRebornGlassTokens.current
 
     if (showAppPicker) {
         MultiAppSelectorDialog(
@@ -324,16 +333,13 @@ fun DailyLimitEditorDialog(
                 Text(
                     text = "Limit: $minutes min / day",
                     style = MaterialTheme.typography.titleSmall,
-                    color = PhoenixAmber,
+                    color = tokens.accentText,
                 )
                 Slider(
                     value = minutes.toFloat(),
                     onValueChange = { minutes = (it / 5f).roundToInt() * 5 },
                     valueRange = 5f..240f,
-                    colors = SliderDefaults.colors(
-                        thumbColor = PhoenixAmber,
-                        activeTrackColor = PhoenixOrange,
-                    ),
+                    colors = glassSliderColors(),
                 )
                 Text(
                     text = "When limit is reached:",
@@ -360,6 +366,7 @@ fun DailyLimitEditorDialog(
                 }
                 TextButton(
                     onClick = { showAppPicker = true },
+                    colors = glassTextButtonColors(),
                     modifier = Modifier.testTag("daily_limit_pick_apps"),
                 ) {
                     Text("Choose Apps (${packages.size} selected)")
@@ -387,7 +394,7 @@ fun DailyLimitEditorDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss, colors = glassTextButtonColors()) { Text("Cancel") }
         },
     )
 }
@@ -403,6 +410,7 @@ fun LaunchLimitEditorDialog(
     var maxLaunches by remember { mutableIntStateOf(5) }
     var search by remember { mutableStateOf("") }
 
+    val tokens = LocalRebornGlassTokens.current
     val filtered = remember(selectable, search) {
         val q = search.trim().lowercase()
         selectable.filter { q.isEmpty() || it.label.lowercase().contains(q) }
@@ -421,11 +429,17 @@ fun LaunchLimitEditorDialog(
                     Text(
                         text = "Max opens/day: $maxLaunches",
                         style = MaterialTheme.typography.titleSmall,
-                        color = PhoenixAmber,
+                        color = tokens.accentText,
                     )
                     Row {
-                        TextButton(onClick = { if (maxLaunches > 1) maxLaunches-- }) { Text("-1") }
-                        TextButton(onClick = { if (maxLaunches < 50) maxLaunches++ }) { Text("+1") }
+                        TextButton(
+                            onClick = { if (maxLaunches > 1) maxLaunches-- },
+                            colors = glassTextButtonColors(),
+                        ) { Text("-1") }
+                        TextButton(
+                            onClick = { if (maxLaunches < 50) maxLaunches++ },
+                            colors = glassTextButtonColors(),
+                        ) { Text("+1") }
                     }
                 }
                 OutlinedTextField(
@@ -478,7 +492,7 @@ fun LaunchLimitEditorDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss, colors = glassTextButtonColors()) { Text("Cancel") }
         },
     )
 }

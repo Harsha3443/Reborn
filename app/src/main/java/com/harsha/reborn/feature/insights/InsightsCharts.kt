@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,13 +48,8 @@ import androidx.compose.ui.unit.dp
 import com.harsha.reborn.core.data.model.DailyInsightPoint
 import com.harsha.reborn.core.engine.InsightsCalculator
 import com.harsha.reborn.ui.components.GlassCard
-import com.harsha.reborn.ui.components.GlassPillBadge
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
 import com.harsha.reborn.ui.theme.LocalRebornReduceMotion
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixCrimson
-import com.harsha.reborn.ui.theme.PhoenixOrange
-import com.harsha.reborn.ui.theme.StatusHealthy
 
 @Composable
 fun WeeklyScreenTimeChartCard(
@@ -77,9 +73,9 @@ fun WeeklyScreenTimeChartCard(
     val safeIndex = selectedIndex.coerceIn(0, (points.size - 1).coerceAtLeast(0))
     val selectedPoint = points.getOrNull(safeIndex)
     val maxMinutes = (points.maxOfOrNull { it.screenTimeMinutes } ?: 0).coerceAtLeast(60)
-    val outlineColor = tokens.borderTopLeft.copy(alpha = 0.42f)
+    val outlineColor = tokens.borderBottomRight
     val trackColor = tokens.cardSubtleFill
-    val avgLineColor = MaterialTheme.colorScheme.secondary
+    val avgLineColor = tokens.accentText
 
     GlassCard(
         cornerRadius = 26.dp,
@@ -107,19 +103,14 @@ fun WeeklyScreenTimeChartCard(
                     )
                 }
                 if (selectedPoint != null) {
-                    GlassPillBadge(
-                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
-                        borderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                    ) {
-                        Text(
-                            text = "${selectedPoint.dayLabel}: ${
-                                InsightsCalculator.formatDurationMinutes(selectedPoint.screenTimeMinutes)
-                            }",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
+                    Text(
+                        text = "${selectedPoint.dayLabel}: ${
+                            InsightsCalculator.formatDurationMinutes(selectedPoint.screenTimeMinutes)
+                        }",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = tokens.accentText,
+                    )
                 }
             }
 
@@ -145,33 +136,30 @@ fun WeeklyScreenTimeChartCard(
                     val bottomPad = 6.dp.toPx()
                     val chartHeight = (size.height - topPad - bottomPad).coerceAtLeast(10f)
 
-                    // Grid lines (50% and 100%)
                     listOf(0f, 0.5f).forEach { frac ->
                         val y = topPad + chartHeight * frac
                         drawLine(
                             color = outlineColor,
                             start = Offset(0f, y),
                             end = Offset(size.width, y),
-                            strokeWidth = 1.dp.toPx(),
+                            strokeWidth = 0.75.dp.toPx(),
                         )
                     }
 
-                    // Average dashed guide line
                     if (averageMinutes > 0) {
                         val avgRatio = (averageMinutes.toFloat() / maxMinutes.toFloat()).coerceIn(0f, 1f)
                         val avgY = topPad + chartHeight * (1f - avgRatio)
                         drawLine(
-                            color = avgLineColor.copy(alpha = 0.72f),
+                            color = avgLineColor.copy(alpha = 0.65f),
                             start = Offset(0f, avgY),
                             end = Offset(size.width, avgY),
-                            strokeWidth = 1.5.dp.toPx(),
+                            strokeWidth = 1.dp.toPx(),
                             pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f), 0f),
                         )
                     }
 
                     points.forEachIndexed { idx, point ->
                         val left = idx * slotWidth + (slotWidth - barWidth) / 2f
-                        // Background frosted track
                         drawRoundRect(
                             color = trackColor,
                             topLeft = Offset(left, topPad),
@@ -189,13 +177,9 @@ fun WeeklyScreenTimeChartCard(
                             val isSelected = idx == safeIndex
                             val brush = Brush.verticalGradient(
                                 colors = if (isSelected) {
-                                    listOf(PhoenixAmber, PhoenixOrange, PhoenixCrimson)
+                                    tokens.accentGradient
                                 } else {
-                                    listOf(
-                                        PhoenixAmber.copy(alpha = 0.78f),
-                                        PhoenixOrange.copy(alpha = 0.78f),
-                                        PhoenixCrimson.copy(alpha = 0.78f),
-                                    )
+                                    tokens.accentGradient.map { it.copy(alpha = 0.72f) }
                                 },
                                 startY = topY,
                                 endY = topPad + chartHeight,
@@ -245,9 +229,9 @@ fun WeeklyBlocksVsUnlocksChartCard(
     val selectedPoint = points.getOrNull(safeIndex)
     val maxCount = (points.maxOfOrNull { maxOf(it.blockedCount, it.unlockAttemptsCount) } ?: 0)
         .coerceAtLeast(4)
-    val outlineColor = tokens.borderTopLeft.copy(alpha = 0.42f)
-    val blockedColor = StatusHealthy
-    val unlockColor = PhoenixAmber
+    val outlineColor = tokens.borderBottomRight
+    val blockedColor = tokens.accentGradient.first()
+    val unlockColor = MaterialTheme.colorScheme.onSurfaceVariant
 
     GlassCard(
         cornerRadius = 26.dp,
@@ -257,23 +241,17 @@ fun WeeklyBlocksVsUnlocksChartCard(
             .testTag("insights_blocks_unlocks_chart"),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column {
-                    Text(
-                        text = "Blocks vs. Unlock Passes",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        text = "$totalBlocked blocked • $totalUnlocks unlock passes this week",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+            Column {
+                Text(
+                    text = "Blocks vs. Unlock Passes",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = "$totalBlocked blocked • $totalUnlocks unlock passes this week",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
 
             Row(
@@ -308,14 +286,14 @@ fun WeeklyBlocksVsUnlocksChartCard(
                             color = outlineColor,
                             start = Offset(0f, y),
                             end = Offset(size.width, y),
-                            strokeWidth = 1.dp.toPx(),
+                            strokeWidth = 0.75.dp.toPx(),
                         )
                     }
 
                     points.forEachIndexed { idx, point ->
                         val startX = idx * slotWidth + (slotWidth - pairWidth) / 2f
                         val isSelected = idx == safeIndex
-                        val alpha = if (isSelected) 1f else 0.78f
+                        val alpha = if (isSelected) 1f else 0.72f
 
                         val blockedFrac = (point.blockedCount.toFloat() / maxCount.toFloat())
                             .coerceIn(0f, 1f) * animProgress
@@ -351,23 +329,15 @@ fun WeeklyBlocksVsUnlocksChartCard(
                 )
 
                 if (selectedPoint != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(tokens.cardSubtleFill)
-                            .border(1.dp, tokens.borderBottomRight, RoundedCornerShape(16.dp))
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                    ) {
-                        Text(
-                            text = "${selectedPoint.dayLabel} (${selectedPoint.dateIso}): " +
-                                "${selectedPoint.blockedCount} blocked • " +
-                                "${selectedPoint.unlockAttemptsCount} unlock attempts" +
-                                if (selectedPoint.isRebornDay) " • Reborn day" else "",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
+                    Text(
+                        text = "${selectedPoint.dayLabel} (${selectedPoint.dateIso}): " +
+                            "${selectedPoint.blockedCount} blocked • " +
+                            "${selectedPoint.unlockAttemptsCount} unlock attempts" +
+                            if (selectedPoint.isRebornDay) " • Reborn day" else "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
         }
@@ -400,7 +370,7 @@ private fun DaySelectorRow(
                     .clip(shape)
                     .background(
                         if (selected) {
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+                            tokens.accentTintFill
                         } else {
                             Color.Transparent
                         }
@@ -408,8 +378,8 @@ private fun DaySelectorRow(
                     .then(
                         if (selected) {
                             Modifier.border(
-                                1.dp,
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                                0.75.dp,
+                                tokens.accentBorder,
                                 shape,
                             )
                         } else {
@@ -440,7 +410,7 @@ private fun DaySelectorRow(
                         .size(6.dp)
                         .clip(CircleShape)
                         .background(
-                            if (point.isRebornDay) PhoenixOrange else tokens.borderTopLeft
+                            if (point.isRebornDay) tokens.accentText else tokens.borderTopLeft
                         ),
                 )
             }
@@ -462,7 +432,7 @@ private fun LegendPill(color: Color, label: String) {
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }

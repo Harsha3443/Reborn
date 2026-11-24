@@ -98,7 +98,7 @@ fun GlassCard(
         modifier = modifier
             .then(if (onClick != null) Modifier.heightIn(min = 48.dp) else Modifier)
             .shadow(
-                elevation = if (elevated) 14.dp else 8.dp,
+                elevation = if (elevated) 8.dp else 4.dp,
                 shape = shape,
                 ambientColor = tokens.shadowColor,
                 spotColor = tokens.shadowColor,
@@ -114,24 +114,11 @@ fun GlassCard(
                             Color.Transparent,
                         ),
                         startY = 0f,
-                        endY = size.height * 0.38f,
+                        endY = size.height * 0.28f,
                     )
                 )
-                // Soft top-left specular gleam
-                drawLine(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            tokens.borderTopLeft.copy(alpha = tokens.borderTopLeft.alpha * 0.85f),
-                            Color.Transparent,
-                        )
-                    ),
-                    start = Offset(0f, 1.dp.toPx()),
-                    end = Offset(size.width, 1.dp.toPx()),
-                    strokeWidth = 1.dp.toPx(),
-                )
             }
-            .border(BorderStroke(1.dp, borderBrush), shape = shape)
+            .border(BorderStroke(0.75.dp, borderBrush), shape = shape)
             .then(interactiveModifier),
     ) {
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
@@ -156,10 +143,10 @@ fun GlassPillBadge(
     val fill = containerColor ?: tokens.cardElevatedFill
     val shape = RoundedCornerShape(50)
     val stroke = if (borderColor != null) {
-        BorderStroke(1.dp, borderColor)
+        BorderStroke(0.75.dp, borderColor.copy(alpha = 0.55f))
     } else {
         BorderStroke(
-            1.dp,
+            0.75.dp,
             Brush.linearGradient(listOf(tokens.borderTopLeft, tokens.borderBottomRight)),
         )
     }
@@ -198,11 +185,11 @@ fun GlassAlertDialog(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
                 .widthIn(max = 460.dp)
-                .shadow(20.dp, shape = shape, ambientColor = tokens.shadowColor, spotColor = tokens.shadowColor)
+                .shadow(16.dp, shape = shape, ambientColor = tokens.shadowColor, spotColor = tokens.shadowColor)
                 .clip(shape)
                 .background(tokens.modalSheetFill, shape = shape)
                 .border(
-                    width = 1.dp,
+                    width = 0.75.dp,
                     brush = Brush.linearGradient(listOf(tokens.borderTopLeft, tokens.borderBottomRight)),
                     shape = shape,
                 )
@@ -253,18 +240,18 @@ fun glassFilterChipColors() = androidx.compose.material3.FilterChipDefaults.filt
     containerColor = LocalRebornGlassTokens.current.cardSubtleFill,
     labelColor = MaterialTheme.colorScheme.onSurface,
     iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.24f),
+    selectedContainerColor = LocalRebornGlassTokens.current.accentTintFill,
     selectedLabelColor = MaterialTheme.colorScheme.onSurface,
-    selectedLeadingIconColor = MaterialTheme.colorScheme.primary,
+    selectedLeadingIconColor = LocalRebornGlassTokens.current.accentText,
 )
 
 @Composable
 fun glassFilterChipBorder(selected: Boolean): BorderStroke {
     val tokens = LocalRebornGlassTokens.current
     return if (selected) {
-        BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.75f))
+        BorderStroke(0.75.dp, tokens.accentBorder)
     } else {
-        BorderStroke(1.dp, Brush.linearGradient(listOf(tokens.borderTopLeft, tokens.borderBottomRight)))
+        BorderStroke(0.75.dp, Brush.linearGradient(listOf(tokens.borderTopLeft, tokens.borderBottomRight)))
     }
 }
 
@@ -275,6 +262,19 @@ fun glassSwitchColors() = androidx.compose.material3.SwitchDefaults.colors(
     uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
     uncheckedTrackColor = LocalRebornGlassTokens.current.cardElevatedFill,
     uncheckedBorderColor = LocalRebornGlassTokens.current.borderTopLeft,
+)
+
+@Composable
+fun glassSliderColors() = androidx.compose.material3.SliderDefaults.colors(
+    thumbColor = LocalRebornGlassTokens.current.accentText,
+    activeTrackColor = MaterialTheme.colorScheme.primary,
+    inactiveTrackColor = LocalRebornGlassTokens.current.cardElevatedFill,
+)
+
+@Composable
+fun glassTextButtonColors() = androidx.compose.material3.ButtonDefaults.textButtonColors(
+    contentColor = LocalRebornGlassTokens.current.accentText,
+    disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
 )
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)

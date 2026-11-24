@@ -3,23 +3,26 @@ package com.harsha.reborn.feature.blocking
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Lock
@@ -28,6 +31,7 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +45,6 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
@@ -53,21 +56,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.harsha.reborn.core.data.model.AppCategory
 import com.harsha.reborn.core.data.model.InstalledAppInfo
 import com.harsha.reborn.ui.components.GlassCard
-import com.harsha.reborn.ui.components.GlassPillBadge
 import com.harsha.reborn.ui.components.glassFilterChipBorder
 import com.harsha.reborn.ui.components.glassFilterChipColors
 import com.harsha.reborn.ui.components.glassOutlinedTextFieldColors
+import com.harsha.reborn.ui.components.glassTextButtonColors
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixOrange
 
 @Composable
 fun AppPickerScreen(
+    onBack: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     viewModel: AppPickerViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val view = LocalView.current
+    val tokens = LocalRebornGlassTokens.current
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -78,24 +81,40 @@ fun AppPickerScreen(
                 .fillMaxSize()
                 .widthIn(max = 600.dp),
         ) {
-            // Header + Refresh
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column {
-                    Text(
-                        text = "App Picker",
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                    Text(
-                        text = "${state.selectedPackages.size} selected of ${state.totalInstalledCount} apps",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    if (onBack != null) {
+                        IconButton(
+                            onClick = onBack,
+                            modifier = Modifier.testTag("app_picker_back_button"),
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = "Back",
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                    Column {
+                        Text(
+                            text = "App Picker",
+                            style = MaterialTheme.typography.headlineMedium,
+                        )
+                        Text(
+                            text = "${state.selectedPackages.size} selected of ${state.totalInstalledCount} apps",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
                 IconButton(
                     onClick = {
@@ -114,11 +133,11 @@ fun AppPickerScreen(
             if (state.isStrictSettingsLocked) {
                 GlassCard(
                     cornerRadius = 20.dp,
-                    tintColor = PhoenixOrange.copy(alpha = 0.14f),
+                    tintColor = tokens.accentTintFill,
                     contentPadding = PaddingValues(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
                         .testTag("app_picker_strict_locked_banner"),
                 ) {
                     Row(
@@ -128,7 +147,7 @@ fun AppPickerScreen(
                         Icon(
                             imageVector = Icons.Rounded.Lock,
                             contentDescription = null,
-                            tint = PhoenixOrange,
+                            tint = tokens.accentText,
                             modifier = Modifier.size(18.dp),
                         )
                         Text(
@@ -139,7 +158,6 @@ fun AppPickerScreen(
                 }
             }
 
-            // Frosted Search bar
             OutlinedTextField(
                 value = state.searchQuery,
                 onValueChange = viewModel::onSearchQueryChange,
@@ -158,17 +176,16 @@ fun AppPickerScreen(
                     }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(22.dp),
                 colors = glassOutlinedTextFieldColors(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 16.dp)
                     .testTag("app_picker_search_input"),
             )
 
-            // Category Filter Chips
             LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(state.availableCategories, key = { it.name }) { category ->
@@ -191,23 +208,23 @@ fun AppPickerScreen(
                 }
             }
 
-            // Multi-select bulk actions
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 2.dp),
+                    .padding(horizontal = 16.dp, vertical = 2.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = "${state.filteredApps.size} shown",
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButton(
                         onClick = { viewModel.selectAllFiltered() },
                         enabled = state.filteredApps.any { !it.isProtectedSystemApp },
+                        colors = glassTextButtonColors(),
                         modifier = Modifier.testTag("app_picker_select_filtered"),
                     ) {
                         Text("Select Filtered")
@@ -215,6 +232,7 @@ fun AppPickerScreen(
                     TextButton(
                         onClick = { viewModel.clearAllSelected() },
                         enabled = state.selectedPackages.isNotEmpty() && !state.isStrictSettingsLocked,
+                        colors = glassTextButtonColors(),
                         modifier = Modifier.testTag("app_picker_clear_all"),
                     ) {
                         Text("Clear")
@@ -222,14 +240,13 @@ fun AppPickerScreen(
                 }
             }
 
-            // App list / Loading / Empty state
             when {
                 state.isLoading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
-                        CircularProgressIndicator(color = PhoenixAmber)
+                        CircularProgressIndicator(color = tokens.accentText)
                     }
                 }
 
@@ -240,7 +257,7 @@ fun AppPickerScreen(
                             .padding(32.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        GlassCard(cornerRadius = 28.dp) {
+                        GlassCard(cornerRadius = 26.dp) {
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -249,8 +266,8 @@ fun AppPickerScreen(
                                 Icon(
                                     imageVector = Icons.Rounded.Apps,
                                     contentDescription = null,
-                                    tint = PhoenixAmber,
-                                    modifier = Modifier.size(44.dp),
+                                    tint = tokens.accentText,
+                                    modifier = Modifier.size(40.dp),
                                 )
                                 Text(
                                     text = "No matching apps found",
@@ -269,8 +286,7 @@ fun AppPickerScreen(
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 104.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 120.dp),
                     ) {
                         items(state.filteredApps, key = { it.packageName }) { app ->
                             AppPickerRow(
@@ -299,31 +315,28 @@ private fun AppPickerRow(
         value = loadIcon(app.packageName)
     }
 
-    GlassCard(
-        onClick = if (app.isProtectedSystemApp) null else onToggle,
-        cornerRadius = 24.dp,
-        elevated = isSelected,
-        tintColor = if (isSelected) PhoenixOrange.copy(alpha = 0.14f) else null,
-        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("app_row_${app.packageName}"),
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 60.dp)
+                .then(
+                    if (app.isProtectedSystemApp) {
+                        Modifier
+                    } else {
+                        Modifier.clickable(onClick = onToggle)
+                    }
+                )
+                .padding(horizontal = 4.dp, vertical = 10.dp)
+                .testTag("app_row_${app.packageName}"),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(tokens.cardElevatedFill)
-                    .border(
-                        width = 1.dp,
-                        brush = Brush.linearGradient(listOf(tokens.borderTopLeft, tokens.borderBottomRight)),
-                        shape = RoundedCornerShape(14.dp),
-                    ),
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(tokens.cardSubtleFill),
                 contentAlignment = Alignment.Center,
             ) {
                 val bmp = icon
@@ -331,7 +344,7 @@ private fun AppPickerRow(
                     Image(
                         bitmap = bmp,
                         contentDescription = "${app.label} icon",
-                        modifier = Modifier.size(34.dp),
+                        modifier = Modifier.size(30.dp),
                     )
                 } else {
                     Text(
@@ -362,7 +375,10 @@ private fun AppPickerRow(
             }
 
             if (app.isProtectedSystemApp) {
-                GlassPillBadge {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.Lock,
                         contentDescription = "Protected system app",
@@ -371,7 +387,7 @@ private fun AppPickerRow(
                     )
                     Text(
                         text = app.protectionReason ?: "Protected",
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -385,5 +401,6 @@ private fun AppPickerRow(
                 )
             }
         }
+        HorizontalDivider(thickness = 0.5.dp, color = tokens.borderBottomRight)
     }
 }

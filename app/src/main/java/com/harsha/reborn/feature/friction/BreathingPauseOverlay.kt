@@ -61,9 +61,9 @@ import com.harsha.reborn.ui.components.PhoenixProgressRing
 import com.harsha.reborn.ui.components.glassFilterChipBorder
 import com.harsha.reborn.ui.components.glassFilterChipColors
 import com.harsha.reborn.ui.components.glassOutlinedTextFieldColors
+import com.harsha.reborn.ui.components.glassTextButtonColors
+import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
 import com.harsha.reborn.ui.theme.LocalRebornReduceMotion
-import com.harsha.reborn.ui.theme.PhoenixAmber
-import com.harsha.reborn.ui.theme.PhoenixOrange
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -87,6 +87,7 @@ fun BreathingPauseShield(
     var selectedDuration by remember { mutableIntStateOf(5) }
     var showUnlockForm by remember { mutableStateOf(false) }
 
+    val tokens = LocalRebornGlassTokens.current
     val reduceMotion = LocalRebornReduceMotion.current
     val breathScale = if (!reduceMotion) {
         val infiniteTransition = rememberInfiniteTransition(label = "breathing_cycle")
@@ -208,11 +209,11 @@ fun BreathingPauseShield(
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val outerRadius = (size.minDimension / 2f) - 10.dp.toPx()
                     drawCircle(
-                        color = PhoenixOrange.copy(alpha = 0.16f * breathScale),
+                        color = tokens.accentGradient.first().copy(alpha = 0.22f * breathScale),
                         radius = outerRadius * breathScale,
                     )
                     drawCircle(
-                        color = PhoenixAmber.copy(alpha = 0.22f),
+                        color = tokens.accentText.copy(alpha = 0.20f),
                         radius = outerRadius * 0.72f * breathScale,
                     )
                 }
@@ -233,7 +234,7 @@ fun BreathingPauseShield(
                                 text = "${remainingPauseSeconds}s",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = PhoenixAmber,
+                                color = tokens.accentText,
                             )
                         }
                     }
@@ -241,13 +242,13 @@ fun BreathingPauseShield(
             }
 
             GlassPillBadge(
-                containerColor = PhoenixOrange.copy(alpha = 0.18f),
-                borderColor = PhoenixAmber.copy(alpha = 0.45f),
+                containerColor = tokens.accentTintFill,
+                borderColor = tokens.accentBorder,
             ) {
                 Text(
                     text = ruleTitle,
                     style = MaterialTheme.typography.labelLarge,
-                    color = PhoenixAmber,
+                    color = tokens.accentText,
                 )
             }
 
@@ -268,7 +269,7 @@ fun BreathingPauseShield(
                     stringResource(id = R.string.app_tagline)
                 },
                 style = MaterialTheme.typography.titleMedium,
-                color = PhoenixAmber,
+                color = tokens.accentText,
                 textAlign = TextAlign.Center,
             )
 
@@ -350,7 +351,7 @@ fun BreathingPauseShield(
                                 Icon(
                                     imageVector = Icons.Rounded.LockOpen,
                                     contentDescription = null,
-                                    tint = PhoenixAmber,
+                                    tint = tokens.accentText,
                                     modifier = Modifier.size(18.dp),
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -363,6 +364,7 @@ fun BreathingPauseShield(
 
             TextButton(
                 onClick = onOpenReborn,
+                colors = glassTextButtonColors(),
                 modifier = Modifier.testTag("block_screen_open_reborn_button"),
             ) {
                 Text("Open Reborn")

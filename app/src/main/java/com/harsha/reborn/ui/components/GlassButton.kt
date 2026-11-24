@@ -34,8 +34,8 @@ import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
 import com.harsha.reborn.ui.theme.rebornPressScale
 
 /**
- * Primary Liquid Glass action button using the Phoenix gradient (#FFB347 -> #FF6B35 -> #E8431A),
- * spring press scale (0.97f), haptic feedback, and high-contrast ink.
+ * Primary Liquid Glass action button using the Burgundy gradient (#A3203A -> #5C0F1E),
+ * spring press scale (0.97f), haptic feedback, and high-contrast ivory ink (#F5EDEF).
  */
 @Composable
 fun GlassPrimaryButton(
@@ -62,11 +62,11 @@ fun GlassPrimaryButton(
     }
     val borderBrush = if (enabled) {
         Brush.linearGradient(
-            colors = listOf(Color.White.copy(alpha = 0.45f), Color.White.copy(alpha = 0.12f))
+            colors = listOf(tokens.selectedBorderTopLeft, tokens.selectedBorderBottomRight)
         )
     } else {
         Brush.linearGradient(
-            colors = listOf(tokens.borderTopLeft.copy(alpha = 0.14f), tokens.borderBottomRight)
+            colors = listOf(tokens.borderTopLeft, tokens.borderBottomRight)
         )
     }
 
@@ -75,14 +75,14 @@ fun GlassPrimaryButton(
             .heightIn(min = 48.dp)
             .rebornPressScale(interactionSource = interactionSource, enabled = enabled)
             .shadow(
-                elevation = if (enabled) 10.dp else 0.dp,
+                elevation = if (enabled) 6.dp else 0.dp,
                 shape = shape,
-                ambientColor = tokens.accentGradient.first().copy(alpha = 0.35f),
-                spotColor = tokens.accentGradient.last().copy(alpha = 0.40f),
+                ambientColor = tokens.buttonShadowStart,
+                spotColor = tokens.buttonShadowEnd,
             )
             .clip(shape)
             .background(brush = backgroundBrush, shape = shape)
-            .border(BorderStroke(1.dp, borderBrush), shape = shape)
+            .border(BorderStroke(0.75.dp, borderBrush), shape = shape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = androidx.compose.material3.ripple(),
@@ -109,7 +109,7 @@ fun GlassPrimaryButton(
 }
 
 /**
- * Secondary frosted glass button with translucent glass fill, 1dp gradient border,
+ * Secondary frosted glass button with translucent glass fill, thin gradient border,
  * spring press scale (0.97f), and haptic feedback.
  */
 @Composable
@@ -143,7 +143,7 @@ fun GlassButton(
             .rebornPressScale(interactionSource = interactionSource, enabled = enabled)
             .clip(shape)
             .background(color = fill, shape = shape)
-            .border(BorderStroke(1.dp, borderBrush), shape = shape)
+            .border(BorderStroke(0.75.dp, borderBrush), shape = shape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = androidx.compose.material3.ripple(),

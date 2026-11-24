@@ -33,8 +33,8 @@ import com.harsha.reborn.core.data.repository.StrictModeRepository
 import com.harsha.reborn.ui.components.GlassAlertDialog
 import com.harsha.reborn.ui.components.PhoenixProgressRing
 import com.harsha.reborn.ui.components.glassOutlinedTextFieldColors
+import com.harsha.reborn.ui.components.glassTextButtonColors
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
-import com.harsha.reborn.ui.theme.PhoenixAmber
 import kotlinx.coroutines.delay
 import java.util.Locale
 
@@ -98,7 +98,7 @@ fun EmergencyEscapeDialog(
                                 ),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = PhoenixAmber,
+                                color = tokens.accentText,
                             )
                         }
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -131,7 +131,7 @@ fun EmergencyEscapeDialog(
                         Text(
                             text = StrictModeRepository.EMERGENCY_ESCAPE_PHRASE,
                             style = MaterialTheme.typography.labelLarge,
-                            color = PhoenixAmber,
+                            color = tokens.accentText,
                         )
                     }
                     OutlinedTextField(
@@ -176,6 +176,7 @@ fun EmergencyEscapeDialog(
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
+                colors = glassTextButtonColors(),
                 modifier = Modifier.testTag("cancel_emergency_escape_button"),
             ) {
                 Text("Stay Locked")

@@ -17,13 +17,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.harsha.reborn.ui.theme.BurgundyGradientColors
 import com.harsha.reborn.ui.theme.LocalRebornGlassTokens
 import com.harsha.reborn.ui.theme.LocalRebornReduceMotion
-import com.harsha.reborn.ui.theme.PhoenixGradientColors
 import com.harsha.reborn.ui.theme.RebornMotion
 
 /**
- * Animated circular progress ring featuring the Phoenix gradient (#FFB347 -> #FF6B35 -> #E8431A)
+ * Animated circular progress ring featuring the Burgundy gradient (#A3203A -> #5C0F1E)
  * over a subtle frosted glass track. Respects system reduce-motion preferences.
  */
 @Composable
@@ -32,7 +32,7 @@ fun PhoenixProgressRing(
     modifier: Modifier = Modifier,
     size: Dp = 76.dp,
     strokeWidth: Dp = 7.dp,
-    sweepColors: List<Color> = PhoenixGradientColors,
+    sweepColors: List<Color> = BurgundyGradientColors,
     trackColor: Color? = null,
     centerContent: @Composable BoxScope.() -> Unit = {},
 ) {
@@ -50,7 +50,7 @@ fun PhoenixProgressRing(
         label = "phoenix_progress_ring",
     )
 
-    val resolvedTrack = trackColor ?: tokens.borderTopLeft.copy(alpha = 0.24f)
+    val resolvedTrack = trackColor ?: tokens.borderTopLeft.copy(alpha = 0.5f)
 
     Box(
         modifier = modifier.size(size),
@@ -61,11 +61,11 @@ fun PhoenixProgressRing(
             // Subtle outer glow
             if (animatedProgress > 0.01f) {
                 drawArc(
-                    color = sweepColors.first().copy(alpha = 0.16f),
+                    color = sweepColors.first().copy(alpha = 0.09f),
                     startAngle = -90f,
                     sweepAngle = 360f * animatedProgress,
                     useCenter = false,
-                    style = Stroke(width = strokePx * 1.9f, cap = StrokeCap.Round),
+                    style = Stroke(width = strokePx * 1.6f, cap = StrokeCap.Round),
                 )
             }
 
